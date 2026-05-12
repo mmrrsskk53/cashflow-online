@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 CASHFLOW ONLINE</title>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ════════════════════════════════════════════════
+  // 🔧 ここにあなたのFirebase設定を貼り付けてください
+  //    Firebase Console → プロジェクト設定 → マイアプリ → SDKの設定と構成
+  // ════════════════════════════════════════════════
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-Y6G11k5N7BgCtUwvA6qFq4EPB0eHtjs",
+    authDomain: "cashflow-game-ea4b1.firebaseapp.com",
+    databaseURL: "https://cashflow-game-ea4b1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "cashflow-game-ea4b1",
+    storageBucket: "cashflow-game-ea4b1.firebasestorage.app",
+    messagingSenderId: "873058064323",
+    appId: "1:873058064323:web:2505527f1978abe1fe4f76"
+  };
+  // ════════════════════════════════════════════════
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // ── GAME DATA ──
+  const TC = ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899"];
+  const N  = 24;
+  const STYPE = {
+    0:"payday",1:"small",2:"small",3:"big",4:"market",5:"small",
+    6:"payday",7:"small",8:"big",9:"market",10:"small",11:"charity",
+    12:"payday",13:"small",14:"big",15:"market",16:"small",17:"small",
+    18:"payday",19:"charity",20:"small",21:"big",22:"market",23:"small"
+  };
+  const SCOL  = {small:"#3b82f6",big:"#8b5cf6",market:"#f59e0b",payday:"#10b981",charity:"#ec4899"};
+  const SICON = {small:"🔵",big:"🟣",market:"🟡",payday:"💰",charity:"🩷"};
+  const SLABEL= {small:"スモールディール",big:"ビッグディール",market:"マーケット",payday:"給料日",charity:"寄付"};
+  const SDESC = {
+    small:"投資カードを引きます。不動産・株・ビジネスなど投資チャンスが登場！",
+    big:"大型投資カードを引きます。アパート・モールなど大きな収益物件のチャンス！",
+    market:"経済イベントカードを引きます。市場変動が起こります。",
+    payday:"通過するたびにキャッシュフロー分の現金を受け取ります！",
+    charity:"給与の10%をチャリティーに強制寄付します。",
+  };
+  const JOBS=[
+    {id:0,name:"医師",      emoji:"👨‍⚕️",sal:13200,exp:{tax:3300,mort:1900,car:380,cc:270,misc:2790,child:640},save:400,debt:{mort:202000,loan:92000,car:19000,cc:9000}},
+    {id:1,name:"弁護士",    emoji:"⚖️", sal:9900, exp:{tax:2400,mort:1900,car:360,cc:270,misc:2290,child:570},save:400,debt:{mort:202000,loan:82000,car:18000,cc:9000}},
+    {id:2,name:"エンジニア",emoji:"💻", sal:7500, exp:{tax:1870,mort:1250,car:260,cc:110,misc:1760,child:370},save:400,debt:{mort:130000,loan:42000,car:13000,cc:3500}},
+    {id:3,name:"教師",      emoji:"📚", sal:3300, exp:{tax:630, mort:500, car:100,cc:50, misc:760, child:150},save:150,debt:{mort:46000, loan:12000,car:5000, cc:2000}},
+    {id:4,name:"警察官",    emoji:"👮", sal:2100, exp:{tax:390, mort:400, car:50, cc:50, misc:560, child:90}, save:100,debt:{mort:37000, loan:0,    car:2000, cc:3000}},
+    {id:5,name:"運転手",    emoji:"🚛", sal:2100, exp:{tax:390, mort:300, car:50, cc:50, misc:550, child:80}, save:100,debt:{mort:23000, loan:0,    car:1500, cc:2000}},
+  ];
+  const SMALL_CARDS=[
+    {id:"s1",kind:"property",name:"2BRアパート",     cost:18000,down:2000, cf:160, info:"2ベッドルームアパート。安定した賃貸収入。"},
+    {id:"s2",kind:"property",name:"3BR/2BAの家",     cost:65000,down:6000, cf:160, info:"3寝室2浴室の一戸建て。"},
+    {id:"s3",kind:"property",name:"コンドミニアム",   cost:45000,down:4000, cf:130, info:"市内のコンドミニアム。"},
+    {id:"s4",kind:"stock",   name:"MYT株",            price:10,             info:"MYT社の株式を1株¥10で購入可。"},
+    {id:"s5",kind:"stock",   name:"OK4U株",           price:20,             info:"OK4U社の株式を1株¥20で購入可。"},
+    {id:"s6",kind:"stock",   name:"GRO4US株",         price:5,              info:"GRO4US社の株式を1株¥5で購入可。"},
+    {id:"s7",kind:"biz",     name:"自動販売機",        cost:5000, down:500,  cf:100, info:"自動販売機事業。"},
+    {id:"s8",kind:"biz",     name:"コインランドリー",  cost:8000, down:800,  cf:200, info:"コインランドリービジネス。"},
+    {id:"s9",kind:"doodad",  name:"新車購入",          carCost:200,          info:"高級車購入。毎月の車ローンが増加。"},
+    {id:"s10",kind:"doodad", name:"海外旅行",          saveLoss:800,         info:"豪華旅行。貯蓄が¥800減ります。"},
+  ];
+  const BIG_CARDS=[
+    {id:"b1",kind:"property",name:"アパート24室",     cost:285000,down:26000,cf:1700,info:"24室アパート。"},
+    {id:"b2",kind:"property",name:"ショッピングモール",cost:650000,down:65000,cf:5000,info:"地域ショッピングモール。"},
+    {id:"b3",kind:"biz",     name:"フランチャイズ店",  cost:160000,down:20000,cf:3000,info:"全国フランチャイズチェーン。"},
+    {id:"b4",kind:"property",name:"商業用倉庫",        cost:280000,down:28000,cf:2500,info:"物流倉庫施設。"},
+    {id:"b5",kind:"biz",     name:"立体駐車場",        cost:80000, down:8000, cf:1200,info:"都心の立体駐車場。"},
+  ];
+  const MKT_CARDS=[
+    {id:"m1",name:"不動産バブル",  fx:"re_up",  who:"all",    mul:1.3, info:"不動産価格30%上昇！"},
+    {id:"m2",name:"株式市場急騰",  fx:"st_up",  who:"all",    mul:2.0, info:"株価急騰！保有株を2倍で売却できます。"},
+    {id:"m3",name:"リストラ",      fx:"layoff", who:"current",         info:"リストラ発生。次の2ターン休みです。"},
+    {id:"m4",name:"医療費",        fx:"expense",who:"current",amt:1000,info:"緊急医療費¥1,000。"},
+    {id:"m5",name:"子供誕生",      fx:"child",  who:"current",         info:"子供が生まれました！"},
+    {id:"m6",name:"税務調査",      fx:"expense",who:"current",amt:500, info:"罰金¥500。"},
+    {id:"m7",name:"株価暴落",      fx:"st_down",who:"all",             info:"株式市場が暴落。"},
+    {id:"m8",name:"ボーナス",      fx:"bonus",  who:"current",amt:2000,info:"ボーナス¥2,000！"},
+    {id:"m9",name:"金利上昇",      fx:"rate_up",who:"all",             info:"金利上昇。住宅ローン10%増。"},
+    {id:"m10",name:"景気好転",     fx:"bonus",  who:"current",amt:3000,info:"景気好転！ボーナス¥3,000。"},
+  ];
+
+  function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+  function getPI(p){return(p.assets||[]).reduce((s,a)=>s+(a.cf||0),0);}
+  function getExp(p){const e=p.exp;return e.tax+e.mort+e.car+e.cc+e.misc+e.child*(p.kids||0);}
+  function getCF(p){return p.sal+getPI(p)-getExp(p);}
+  function genRoomId(){return Math.random().toString(36).substr(2,6).toUpperCase();}
+  function mkP(id,name,jobId,isAI=false){
+    const j=JOBS[jobId];
+    return{id,name,jobId,job:j.name,emoji:isAI?"🤖":j.emoji,sal:j.sal,save:j.save,kids:0,
+      assets:[],stocks:{},debt:{...j.debt},exp:{...j.exp},pos:0,layoff:0,isAI,
+      charityDice:0, bankLoan:0};
+  }
+
+  // ── STATE ──
+  let myPlayerId = null;  // index in players array
+  let roomId     = null;
+  let isHost     = false;
+  let gameState  = null;  // full game state from Firebase
+  let unsubscribe= null;
+
+  // ── UI HELPERS ──
+  const $ = id => document.getElementById(id);
+  function show(id){$(id).style.display="";}
+  function hide(id){$(id).style.display="none";}
+  function showOnly(id){
+    ["screen-lobby","screen-room","screen-game"].forEach(s=>{
+      $(s).style.display = s===id?"flex":"none";
+    });
+  }
+  function log(msg,type="info"){
+    const el=$("game-log");
+    const colors={ok:"#4ade80",err:"#f87171",warn:"#fbbf24",pay:"#34d399",win:"#fbbf24",sys:"#94a3b8",roll:"#93c5fd"};
+    const div=document.createElement("div");
+    div.style.cssText=`font-size:9px;padding:1px 0;border-bottom:1px solid rgba(255,255,255,0.03);color:${colors[type]||"#cbd5e1"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
+    div.textContent=msg;
+    el.insertBefore(div,el.firstChild);
+    while(el.children.length>60)el.removeChild(el.lastChild);
+  }
+  function setStatus(msg){$("status-msg").textContent=msg;}
+
+  // ── FIREBASE HELPERS ──
+  function roomRef(path=""){return ref(db,`rooms/${roomId}${path?"/"+path:""}`);}
+
+  async function saveGame(state){
+    await set(roomRef("state"), {...state, savedAt: Date.now()});
+    await set(roomRef("savedAt"), Date.now());
+  }
+
+  async function loadGame(rid){
+    const snap = await get(ref(db,`rooms/${rid}/state`));
+    return snap.exists() ? snap.val() : null;
+  }
+
+  function listenRoom(){
+    if(unsubscribe) unsubscribe();
+    unsubscribe = onValue(roomRef(), snap=>{
+      if(!snap.exists()) return;
+      const data = snap.val();
+      if(data.state) {
+        gameState = data.state;
+        renderGame();
+      }
+      if(data.log) renderLog(data.log);
+    });
+  }
+
+  async function pushLog(msg, type="info"){
+    const logRef = ref(db,`rooms/${roomId}/log`);
+    const newEntry = await push(logRef,{msg,type,ts:Date.now()});
+  }
+
+  // ── LOBBY LOGIC ──
+  async function createRoom(){
+    const name = $("host-name").value.trim() || "ホスト";
+    const aiN  = parseInt($("ai-count").value)||1;
+    const jobId= parseInt($("host-job").value);
+    roomId  = genRoomId();
+    isHost  = true;
+    myPlayerId = 0;
+
+    const aiJobIds = shuffle([0,1,2,3,4,5].filter(x=>x!==jobId)).slice(0,aiN);
+    const players = [
+      mkP(0, name, jobId, false),
+      ...aiJobIds.map((jid,i)=>mkP(i+1,"AI-"+(i+1),jid,true)),
+    ];
+
+    const initialState = {
+      players,
+      ci: 0,
+      phase: "roll",
+      card: null,
+      ctype: "",
+      dice: null,
+      log: [],
+      mfx: null,
+      dk: {
+        s: shuffle(SMALL_CARDS).map(c=>c.id),
+        b: shuffle(BIG_CARDS).map(c=>c.id),
+        m: shuffle(MKT_CARDS).map(c=>c.id),
+      },
+      winner: null,
+      started: true,
+      savedAt: Date.now(),
+      hostId: myPlayerId,
+    };
+
+    await set(roomRef(), {
+      state: initialState,
+      createdAt: Date.now(),
+      hostName: name,
+      playerCount: players.length,
+    });
+
+    gameState = initialState;
+    listenRoom();
+    showOnly("screen-game");
+    renderRoom();
+    log("🎮 ルーム作成！ルームID: "+roomId, "sys");
+    log("参加者にこのIDを共有: "+roomId, "sys");
+    $("room-id-display").textContent = "ルームID: " + roomId;
+    renderGame();
+  }
+
+  async function joinRoom(){
+    const rid  = $("join-room-id").value.trim().toUpperCase();
+    const name = $("join-name").value.trim() || "ゲスト";
+    if(!rid){alert("ルームIDを入力してください");return;}
+
+    const snap = await get(ref(db,`rooms/${rid}/state`));
+    if(!snap.exists()){alert("ルームが見つかりません: "+rid);return;}
+
+    roomId = rid;
+    isHost = false;
+    const state = snap.val();
+
+    // Find a non-AI human slot or add new
+    // For simplicity, join as observer/spectator with assigned player index
+    // In this implementation, joining players watch and the host controls
+    // Find first non-AI player slot
+    myPlayerId = state.players.findIndex(p=>!p.isAI);
+    // If already taken, assign next available (for demo, just watch as player 0)
+    // In production you'd track who's claimed which slot
+
+    gameState = state;
+    listenRoom();
+    showOnly("screen-game");
+    $("room-id-display").textContent = "ルームID: " + roomId;
+    log("✅ ルーム " + roomId + " に参加しました！", "sys");
+    renderGame();
+  }
+
+  async function loadSavedRoom(){
+    const rid = $("load-room-id").value.trim().toUpperCase();
+    if(!rid){alert("ルームIDを入力してください");return;}
+    const state = await loadGame(rid);
+    if(!state){alert("セーブデータが見つかりません: "+rid);return;}
+    roomId = rid;
+    isHost = true;
+    myPlayerId = 0;
+    gameState = state;
+    listenRoom();
+    showOnly("screen-game");
+    $("room-id-display").textContent = "ルームID: " + roomId + " (ロード済み)";
+    log("💾 ゲームデータをロードしました！", "sys");
+    renderGame();
+  }
+
+  // ── GAME ACTIONS (host only writes to Firebase) ──
+  function canAct(){
+    return isHost; // In a full impl, each player controls their own turn
+  }
+
+  async function doRoll(){
+    if(!canAct()) return;
+    const st = gameState;
+    if(st.phase!=="roll") return;
+    const d1=Math.ceil(Math.random()*6), d2=Math.ceil(Math.random()*6), tot=d1+d2;
+    const ci = st.ci;
+    const players = st.players.map(p=>({...p,assets:[...(p.assets||[])],stocks:{...p.stocks},exp:{...p.exp}}));
+    let p = {...players[ci]};
+    const prev = p.pos;
+    const next = (prev+tot)%N;
+    p.pos = next;
+
+    // Payday check
+    if(next<=prev && tot>0){
+      const cf=getCF(p); p.save+=cf;
+      await pushLog(p.name+" 給料日 +¥"+cf.toLocaleString(),"pay");
+    }
+
+    // Layoff check
+    if(p.layoff>0){
+      p.layoff--;
+      players[ci]=p;
+      const upd={...st, players, phase:"end", dice:{d1,d2,tot}};
+      await saveGame(upd);
+      await pushLog(p.name+" リストラ中スキップ","warn");
+      return;
+    }
+
+    players[ci]=p;
+    const st2 = STYPE[next];
+    await pushLog(p.name+" →"+tot+" マス"+next+"「"+SLABEL[st2]+"」","roll");
+
+    let card=null, ctype="", phase="end";
+    const dk = {...st.dk, s:[...st.dk.s], b:[...st.dk.b], m:[...st.dk.m]};
+
+    if(st2==="small"){
+      const cid=dk.s[0]; dk.s=[...dk.s.slice(1),dk.s[0]];
+      card=SMALL_CARDS.find(c=>c.id===cid)||SMALL_CARDS[0]; ctype="small"; phase="card";
+    } else if(st2==="big"){
+      const cid=dk.b[0]; dk.b=[...dk.b.slice(1),dk.b[0]];
+      card=BIG_CARDS.find(c=>c.id===cid)||BIG_CARDS[0]; ctype="big"; phase="card";
+    } else if(st2==="market"){
+      const cid=dk.m[0]; dk.m=[...dk.m.slice(1),dk.m[0]];
+      card=MKT_CARDS.find(c=>c.id===cid)||MKT_CARDS[0]; ctype="mkt"; phase="card";
+    } else if(st2==="charity"){
+      const amt=Math.floor(p.sal*0.1);
+      players[ci].save=Math.max(0,players[ci].save-amt);
+      await pushLog(p.name+" チャリティー ¥"+amt,"warn");
+      phase="end";
+    }
+
+    const upd={...st, players, phase, dice:{d1,d2,tot}, card, ctype, dk};
+    await saveGame(upd);
+  }
+
+  async function doCardAction(act){
+    if(!canAct()) return;
+    const st = gameState;
+    if(!st.card) return;
+    const ci = st.ci;
+    const players = st.players.map(p=>({...p,assets:[...(p.assets||[])],stocks:{...p.stocks},exp:{...p.exp}}));
+    let p = {...players[ci]};
+    const c = st.card;
+    const ct = st.ctype;
+
+    if(ct==="mkt"){
+      await applyMarket(st,c);
+      return;
+    }
+
+    if(act==="buy"){
+      if(c.kind==="property"||c.kind==="biz"){
+        if(p.save>=c.down){
+          p.save-=c.down;
+          p.assets=[...(p.assets||[]),{...c,uid:c.id+Date.now()}];
+          players[ci]=p;
+          await pushLog(p.name+" 「"+c.name+"」購入 +¥"+c.cf+"/月","ok");
+          const upd={...st,players,phase:"end",card:null,ctype:""};
+          await saveGame(upd);
+          await checkWin(upd,ci);
+          return;
+        } else {
+          await pushLog("資金不足 頭金¥"+c.down+"必要","err");
+        }
+      } else if(c.kind==="stock"){
+        // Open stock qty UI
+        $("stock-modal").style.display="flex";
+        $("stock-name").textContent=c.name;
+        $("stock-price").textContent=c.price;
+        $("stock-max").textContent=Math.floor(p.save/c.price)||0;
+        $("stock-qty").value=1;
+        return;
+      } else if(c.kind==="doodad"){
+        if(c.saveLoss) p.save=Math.max(0,p.save-c.saveLoss);
+        if(c.carCost) p.exp={...p.exp,car:p.exp.car+c.carCost};
+        players[ci]=p;
+        await pushLog(p.name+" 「"+c.name+"」ムダ遣い","warn");
+      }
+    } else {
+      await pushLog(p.name+" 「"+c.name+"」見送り","info");
+    }
+    players[ci]=p;
+    await saveGame({...st,players,phase:"end",card:null,ctype:""});
+  }
+
+  async function doBuyStock(){
+    const st = gameState;
+    const qty = parseInt($("stock-qty").value)||0;
+    $("stock-modal").style.display="none";
+    if(qty<=0){await saveGame({...st,phase:"end",card:null,ctype:""});return;}
+    const ci = st.ci;
+    const players = st.players.map(p=>({...p,stocks:{...p.stocks}}));
+    let p={...players[ci]};
+    const c=st.card;
+    const total=qty*c.price;
+    if(p.save>=total){
+      p.save-=total;
+      p.stocks={...p.stocks,[c.name]:(p.stocks[c.name]||0)+qty};
+      await pushLog(p.name+" "+c.name+" "+qty+"株購入","ok");
+    } else { await pushLog("資金不足","err"); }
+    players[ci]=p;
+    await saveGame({...st,players,phase:"end",card:null,ctype:""});
+  }
+
+  async function applyMarket(st,mc){
+    const players = st.players.map(p=>({...p,exp:{...p.exp},stocks:{...p.stocks}}));
+    const ci=st.ci;
+    let mfx=st.mfx||null;
+    if(mc.who==="current"){
+      let p={...players[ci]};
+      if(mc.fx==="child"){p.kids=(p.kids||0)+1;await pushLog(p.name+" 子供誕生！","info");}
+      if(mc.fx==="expense"){p.save=Math.max(0,p.save-mc.amt);await pushLog(p.name+" 出費¥"+mc.amt,"warn");}
+      if(mc.fx==="bonus"){p.save+=mc.amt;await pushLog(p.name+" ボーナス+¥"+mc.amt,"ok");}
+      if(mc.fx==="layoff"){p.layoff=2;await pushLog(p.name+" リストラ！2ターン休み","err");}
+      players[ci]=p;
+    } else {
+      if(mc.fx==="re_up"){mfx={type:"re_up",mul:mc.mul};await pushLog("不動産価格上昇！130%売却可","ok");}
+      if(mc.fx==="st_up"){mfx={type:"st_up",mul:mc.mul};await pushLog("株価急騰！"+mc.mul+"倍売却可","ok");}
+      if(mc.fx==="st_down"){await pushLog("株価暴落！","err");}
+      if(mc.fx==="rate_up"){players.forEach(p=>{p.exp={...p.exp,mort:Math.floor(p.exp.mort*1.1)};});await pushLog("金利上昇！全員ローン10%増","warn");}
+    }
+    await saveGame({...st,players,mfx,phase:"end",card:null,ctype:""});
+  }
+
+  async function doEndTurn(){
+    if(!canAct()) return;
+    const st = gameState;
+    const next = (st.ci+1)%st.players.length;
+    await saveGame({...st, ci:next, phase:"roll", dice:null, card:null, ctype:""});
+    // Schedule AI turn if next is AI
+    const nxt = st.players[next];
+    if(nxt&&nxt.isAI) setTimeout(runAITurn,1200);
+  }
+
+  async function runAITurn(){
+    const st = gameState;
+    if(!st||!canAct()) return;
+    const ci=st.ci;
+    const p=st.players[ci];
+    if(!p||!p.isAI) return;
+
+    if(st.phase==="roll") { await doRoll(); return; }
+    if(st.phase==="card"&&st.card){
+      const c=st.card,ct=st.ctype;
+      let act="skip";
+      if(ct==="mkt") act="apply";
+      else if(c.kind!=="doodad"&&(c.kind==="property"||c.kind==="biz")&&p.save>=c.down&&c.cf>=50) act="buy";
+      else if(c.kind==="stock"&&p.save>=c.price*5) act="buy";
+      if(act==="buy"&&c.kind==="stock"){
+        const qty=Math.max(1,Math.min(Math.floor(p.save*0.3/c.price),Math.floor(p.save/c.price)));
+        await pushLog("🤖 "+p.name+" "+c.name+" "+qty+"株購入","info");
+        const players=st.players.map(x=>({...x,stocks:{...x.stocks}}));
+        let np={...players[ci]};const total=qty*c.price;
+        if(np.save>=total){np.save-=total;np.stocks={...np.stocks,[c.name]:(np.stocks[c.name]||0)+qty};}
+        players[ci]=np;
+        await saveGame({...st,players,phase:"end",card:null,ctype:""});
+      } else {
+        await pushLog("🤖 "+p.name+" 「"+c.name+"」"+(act==="skip"?"見送り":"購入/適用"),"info");
+        await doCardAction(act);
+      }
+      return;
+    }
+    if(st.phase==="end") { await doEndTurn(); return; }
+    setTimeout(runAITurn,800);
+  }
+
+  async function checkWin(st,idx){
+    const p=st.players[idx];
+    const pi=getPI(p),me=getExp(p);
+    if(pi>=me){
+      await saveGame({...st,winner:p.name});
+      await pushLog("🎉 "+p.name+" ラットレース脱出！","win");
+    }
+  }
+
+  async function sellAsset(playerIdx, assetIdx){
+    if(!canAct()) return;
+    const st=gameState;
+    const players=st.players.map(p=>({...p,assets:[...(p.assets||[])]}));
+    const p={...players[playerIdx]};
+    const a=p.assets[assetIdx];
+    let price=a.cost||0;
+    if(st.mfx&&st.mfx.type==="re_up"&&(a.kind==="property"||a.kind==="biz"))price=Math.floor(price*st.mfx.mul);
+    p.save+=price; p.assets=p.assets.filter((_,i)=>i!==assetIdx);
+    players[playerIdx]=p;
+    await pushLog(p.name+" 「"+a.name+"」¥"+price.toLocaleString()+"売却","info");
+    const upd={...st,players};
+    await saveGame(upd);
+    await checkWin(upd,playerIdx);
+  }
+
+  async function sellStock(playerIdx, sname){
+    if(!canAct()) return;
+    const st=gameState;
+    const players=st.players.map(p=>({...p,stocks:{...p.stocks}}));
+    const p={...players[playerIdx]};
+    const qty=p.stocks[sname]||0; if(!qty)return;
+    const sc=SMALL_CARDS.find(c=>c.name===sname); if(!sc)return;
+    let price=sc.price||0;
+    if(st.mfx&&st.mfx.type==="st_up")price=Math.floor(price*st.mfx.mul);
+    const total=qty*price; p.save+=total; delete p.stocks[sname];
+    players[playerIdx]=p;
+    await pushLog(p.name+" "+sname+" "+qty+"株¥"+total+"売却","ok");
+    await saveGame({...st,players});
+  }
+
+  async function takeBankLoan(playerIdx, amount){
+    if(!canAct()||amount<=0) return;
+    const st=gameState;
+    const players=st.players.map(p=>({...p,exp:{...p.exp}}));
+    const p={...players[playerIdx]};
+    p.save+=amount;
+    p.bankLoan=(p.bankLoan||0)+amount;
+    p.exp={...p.exp,bankLoan:((p.exp.bankLoan||0)+amount*0.1)};
+    players[playerIdx]=p;
+    await pushLog(p.name+" 銀行ローン¥"+amount+"借入（月利10%）","warn");
+    await saveGame({...st,players});
+  }
+
+  async function repayLoan(playerIdx, amount){
+    if(!canAct()||amount<=0) return;
+    const st=gameState;
+    const players=st.players.map(p=>({...p,exp:{...p.exp}}));
+    const p={...players[playerIdx]};
+    const actual=Math.min(amount,p.bankLoan||0);
+    if(p.save<actual){await pushLog("返済資金不足","err");return;}
+    p.save-=actual;
+    p.bankLoan=(p.bankLoan||0)-actual;
+    p.exp={...p.exp,bankLoan:Math.max(0,(p.exp.bankLoan||0)-actual*0.1)};
+    players[playerIdx]=p;
+    await pushLog(p.name+" 銀行ローン¥"+actual+"返済","ok");
+    await saveGame({...st,players});
+  }
+
+  // ── RENDER ──
+  function renderRoom(){
+    if(!roomId) return;
+    $("room-id-display").textContent="ルームID: "+roomId;
+  }
+
+  function renderGame(){
+    const st = gameState;
+    if(!st) return;
+    const players = st.players||[];
+    const cp = players[st.ci];
+    if(!cp) return;
+
+    const isAITurn = cp.isAI;
+    const myP = players[myPlayerId]||players[0];
+    const pi = getPI(myP), me = getExp(myP);
+    const pct = Math.min(100,Math.round((pi/Math.max(1,me))*100));
+
+    // Header
+    $("cur-player-name").textContent=(isAITurn?"🤖 ":"")+(cp.name||"")+"（"+cp.job+"）のターン";
+    $("header-turn").style.background=isAITurn?"rgba(139,92,246,0.1)":"rgba(251,191,36,0.07)";
+    $("header-turn").style.borderColor=isAITurn?"rgba(139,92,246,0.3)":"rgba(251,191,36,0.2)";
+    $("header-turn").style.color=isAITurn?"#a78bfa":"#fbbf24";
+
+    // My stats bar
+    $("my-passive").textContent="¥"+pi.toLocaleString();
+    $("my-expense").textContent="¥"+me.toLocaleString();
+    $("my-save").textContent="¥"+(myP.save||0).toLocaleString();
+    $("my-cf").textContent="¥"+getCF(myP).toLocaleString();
+    $("my-pct").textContent=pct+"%"+(pct>=100?" 🎉":"");
+    $("progress-fill").style.width=pct+"%";
+
+    // Board
+    renderBoard(st);
+
+    // Center panel
+    renderCenter(st);
+
+    // Player cards
+    renderPlayers(st);
+
+    // My assets
+    renderMyAssets(st);
+
+    // Winner overlay
+    if(st.winner){
+      $("winner-name").textContent=st.winner;
+      $("winner-overlay").style.display="flex";
+    } else {
+      $("winner-overlay").style.display="none";
+    }
+
+    // Room ID display
+    renderRoom();
+  }
+
+  function renderBoard(st){
+    const boardEl = $("board");
+    boardEl.innerHTML="";
+    const W=680,H=440,SW=76,SH=76;
+
+    function calcPos(idx){
+      if(idx<=6)  return{x:idx*(W-SW)/6,y:0};
+      if(idx<=11) return{x:W-SW,y:(idx-6)*(H-SH)/6};
+      if(idx<=18) return{x:(18-idx)*(W-SW)/6,y:H-SH};
+      return{x:0,y:(24-idx)*(H-SH)/5};
+    }
+
+    // Outer border
+    const border=document.createElement("div");
+    border.style.cssText=`position:absolute;inset:0;border:3px solid rgba(251,191,36,0.18);border-radius:12px;pointer-events:none;`;
+    boardEl.appendChild(border);
+
+    // Spaces
+    for(let i=0;i<N;i++){
+      const pos=calcPos(i);
+      const t=STYPE[i],col=SCOL[t]||"#374151";
+      const here=(st.players||[]).filter(p=>p.pos===i);
+      const isHL=st.dice&&((st.players[st.ci]||{}).pos===i);
+
+      const div=document.createElement("div");
+      div.style.cssText=`position:absolute;left:${pos.x}px;top:${pos.y}px;width:${SW}px;height:${SH}px;`+
+        `background:${isHL?col+"55":"rgba(255,255,255,0.02)"};`+
+        `border:2px solid ${isHL?"#fbbf24":col+"88"};border-radius:9px;cursor:pointer;`+
+        `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;`+
+        `box-shadow:${isHL?`0 0 14px ${col}`:""};z-index:${isHL?6:2};overflow:hidden;transition:all 0.15s;`;
+      div.innerHTML=`
+        <div style="font-size:7px;color:rgba(255,255,255,0.25);font-weight:600;">${i}</div>
+        <div style="font-size:20px;line-height:1;">${SICON[t]}</div>
+        <div style="font-size:7px;color:${isHL?"#fbbf24":col};font-weight:700;text-align:center;line-height:1.2;">
+          ${{small:"小",big:"大",market:"市",payday:"給料日",charity:"寄付"}[t]}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:1px;justify-content:center;max-width:${SW-6}px;">
+          ${here.map(p=>`<div style="width:18px;height:18px;border-radius:50%;background:${TC[p.id%6]};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:800;">${p.isAI?"🤖":p.name[0]}</div>`).join("")}
+        </div>`;
+      div.title=SLABEL[t]+": "+SDESC[t];
+      div.addEventListener("mouseenter",()=>{div.style.background=col+"33";div.style.boxShadow=`0 0 8px ${col}66`;});
+      div.addEventListener("mouseleave",()=>{div.style.background=isHL?col+"55":"rgba(255,255,255,0.02)";div.style.boxShadow=isHL?`0 0 14px ${col}`:""});
+      boardEl.appendChild(div);
+    }
+
+    // Corners
+    [[0,0],[W-SW,0],[0,H-SH],[W-SW,H-SH]].forEach(([cx,cy])=>{
+      const c=document.createElement("div");
+      c.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${SW}px;height:${SH}px;background:linear-gradient(135deg,#1a2744,#080f1e);border:2px solid rgba(251,191,36,0.35);border-radius:9px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none;`;
+      c.innerHTML=`<span style="font-size:26px;">⭐</span>`;
+      boardEl.appendChild(c);
+    });
+
+    // Center panel
+    const center=document.createElement("div");
+    center.style.cssText=`position:absolute;left:${SW+2}px;top:${SH+2}px;width:${W-SW*2-4}px;height:${H-SH*2-4}px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:8px;overflow:hidden;z-index:4;`;
+    center.innerHTML=`<div style="position:absolute;top:5px;font-size:10px;color:rgba(255,255,255,0.08);letter-spacing:6px;font-weight:700;">🐀 RAT RACE</div>`;
+    const actionDiv=document.createElement("div");
+    actionDiv.id="center-action";
+    center.appendChild(actionDiv);
+    boardEl.appendChild(center);
+    renderCenter(st);
+  }
+
+  function renderCenter(st){
+    const el=$("center-action");
+    if(!el) return;
+    const cp=st.players[st.ci]||{};
+    const isAI=cp.isAI;
+    const myTurn=(st.ci===myPlayerId);
+
+    if(st.winner){el.innerHTML=`<div style="font-size:36px;">🏆</div><div style="color:#fbbf24;font-weight:800;font-size:14px;">${st.winner} 脱出！</div>`;return;}
+
+    if(isAI){
+      el.innerHTML=`
+        <div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:6px 14px;font-size:11px;color:#a78bfa;display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;animation:pulse 0.7s infinite;"></div>
+          🤖 ${cp.name} が考え中...
+        </div>`;
+      return;
+    }
+
+    if(st.phase==="roll"){
+      const d=st.dice;
+      el.innerHTML=`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="font-size:48px;background:#0f172a;border-radius:12px;padding:4px 10px;border:2px solid rgba(255,255,255,0.12);">${d?["","⚀","⚁","⚂","⚃","⚄","⚅"][d.d1]:"⚄"}</div>
+          <span style="font-size:22px;color:#475569;">+</span>
+          <div style="font-size:48px;background:#0f172a;border-radius:12px;padding:4px 10px;border:2px solid rgba(255,255,255,0.12);">${d?["","⚀","⚁","⚂","⚃","⚄","⚅"][d.d2]:"⚄"}</div>
+          ${d?`<span style="font-size:36px;font-weight:800;color:#fbbf24;">= ${d.tot}</span>`:""}
+        </div>
+        ${myTurn?`<button onclick="doRoll()" style="padding:10px 30px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:14px;font-weight:800;cursor:pointer;">🎲 ダイスを振る</button>`
+        :`<div style="color:#64748b;font-size:11px;">${cp.name} のターンを待っています...</div>`}
+        <div style="font-size:9px;color:rgba(255,255,255,0.2);">${cp.emoji||""} ${cp.name||""}（${cp.job||""}）のターン</div>`;
+    } else if(st.phase==="card"&&st.card){
+      const c=st.card, ct=st.ctype;
+      const col={small:"#3b82f6",big:"#8b5cf6",mkt:"#f59e0b"}[ct]||"#fbbf24";
+      const lbl={small:"スモールディール",big:"ビッグディール",mkt:"マーケットカード"}[ct]||"";
+      const p=st.players[st.ci]||{};
+      const canBuy=ct==="mkt"||c.kind==="stock"||c.kind==="doodad"||(c.down&&p.save>=c.down);
+      el.innerHTML=`
+        <div style="width:100%;max-width:280px;">
+          <span style="padding:1px 7px;border-radius:4px;border:1px solid ${col};background:${col}22;color:${col};font-size:8px;font-weight:700;">${lbl}</span>
+          <h3 style="font-size:13px;font-weight:800;color:#e2e8f0;margin:4px 0 2px;">${c.name}</h3>
+          <p style="color:#94a3b8;font-size:8px;margin:0 0 5px;">${c.info}</p>
+          <div style="background:rgba(255,255,255,0.03);border-radius:5px;padding:4px 8px;font-size:9px;margin-bottom:5px;">
+            ${c.cost&&!c.price?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">コスト</span><span>¥${c.cost.toLocaleString()}</span></div>`:""}
+            ${c.price?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">株価</span><span>¥${c.price}/株</span></div>`:""}
+            ${c.down?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">頭金</span><span style="color:${p.save>=c.down?"#4ade80":"#f87171"};">¥${c.down.toLocaleString()} ${p.save>=c.down?"✅":"❌"}</span></div>`:""}
+            ${c.cf?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">月CF</span><span style="color:#4ade80;">+¥${c.cf}/月</span></div>`:""}
+          </div>
+          ${myTurn?`
+          <div style="display:flex;gap:6px;">
+            ${ct!=="mkt"?`
+              <button onclick="doCardAction('buy')" ${!canBuy?"disabled":""} style="padding:5px 12px;background:${canBuy?"#10b981":"#374151"};border:none;border-radius:6px;color:${canBuy?"white":"#64748b"};font-weight:700;cursor:${canBuy?"pointer":"not-allowed"};font-size:10px;">${c.kind==="stock"?"株を購入":"購入する"}</button>
+              <button onclick="doCardAction('skip')" style="padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:10px;">見送る</button>
+            `:`<button onclick="doCardAction('apply')" style="padding:5px 12px;background:#10b981;border:none;border-radius:6px;color:white;font-weight:700;cursor:pointer;font-size:10px;">カードを適用</button>`}
+          </div>`:"<div style='color:#64748b;font-size:10px;'>"+cp.name+"の行動を待っています...</div>"}
+        </div>`;
+    } else if(st.phase==="end"){
+      const next=st.players[(st.ci+1)%st.players.length]||{};
+      el.innerHTML=`
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+          <div style="font-size:36px;">✅</div>
+          <p style="color:#94a3b8;margin:0;font-size:11px;">ターン終了</p>
+          <p style="color:#64748b;font-size:9px;margin:0;">次: ${next.isAI?"🤖":next.emoji||""} ${next.name||""}</p>
+          ${myTurn?`<button onclick="doEndTurn()" style="padding:7px 22px;background:#3b82f6;border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;">次のプレイヤーへ →</button>`:""}
+        </div>`;
+    }
+  }
+
+  function renderPlayers(st){
+    const el=$("player-list");
+    el.innerHTML="";
+    (st.players||[]).forEach((p,i)=>{
+      const pi=getPI(p),me=getExp(p),pct=Math.min(100,Math.round((pi/Math.max(1,me))*100));
+      const isCur=i===st.ci;
+      const div=document.createElement("div");
+      div.style.cssText=`flex:0 0 115px;background:#0a1628;border-radius:9px;padding:7px 8px;cursor:pointer;border:1px solid ${isCur?TC[i%6]+"88":p.isAI?"rgba(139,92,246,0.15)":"rgba(255,255,255,0.05)"};`;
+      div.innerHTML=`
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:${TC[i%6]};display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:${isCur?"0 0 7px "+TC[i%6]:"none"};">${p.isAI?"🤖":p.name[0]}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:9px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}${p.isAI?`<span style="font-size:7px;color:#8b5cf6;"> AI</span>`:""}</div>
+            <div style="font-size:7px;color:#64748b;">${p.job}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:8px;color:#94a3b8;margin-bottom:2px;">
+          <span>¥${(p.save||0).toLocaleString()}</span>
+          <span style="color:${pct>=100?"#4ade80":"#94a3b8"};">${pct}%</span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${TC[i%6]};"></div>
+        </div>
+        ${p.layoff>0?`<div style="font-size:7px;color:#f87171;margin-top:2px;">リストラ中</div>`:""}
+        ${(p.assets||[]).length>0||Object.keys(p.stocks||{}).length>0?`<div style="font-size:7px;color:#4ade80;margin-top:1px;">資産${(p.assets||[]).length} 株${Object.keys(p.stocks||{}).length}</div>`:""}
+      `;
+      div.addEventListener("click",()=>showFinModal(i));
+      el.appendChild(div);
+    });
+  }
+
+  function renderMyAssets(st){
+    const myP=st.players[myPlayerId]||st.players[0]||{};
+    const el=$("my-assets");
+    el.innerHTML="";
+    (myP.assets||[]).forEach((a,idx)=>{
+      const chip=document.createElement("div");
+      chip.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+      chip.innerHTML=`<span>${a.name}</span><span style="color:#4ade80;">+¥${a.cf}</span>${canAct()?`<button onclick="sellAsset(${myPlayerId},${idx})" style="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:7px;">売</button>`:""}`;
+      el.appendChild(chip);
+    });
+    Object.entries(myP.stocks||{}).forEach(([sn,qty])=>{
+      const chip=document.createElement("div");
+      chip.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(147,197,253,0.08);border:1px solid rgba(147,197,253,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+      chip.innerHTML=`<span>${sn}</span><span style="color:#93c5fd;">${qty}株</span>${canAct()?`<button onclick="sellStock(${myPlayerId},'${sn}')" style="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:7px;">売</button>`:""}`;
+      el.appendChild(chip);
+    });
+    if((myP.bankLoan||0)>0){
+      const chip=document.createElement("div");
+      chip.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+      chip.innerHTML=`<span style="color:#f87171;">銀行ローン ¥${(myP.bankLoan||0).toLocaleString()}</span>${canAct()?`<button onclick="showRepayModal()" style="padding:0 3px;background:rgba(74,222,128,0.15);border:none;border-radius:2px;color:#4ade80;cursor:pointer;font-size:7px;">返済</button>`:""}`;
+      el.appendChild(chip);
+    }
+  }
+
+  function renderLog(logData){
+    if(!logData) return;
+    const entries=Object.values(logData).sort((a,b)=>b.ts-a.ts).slice(0,60);
+    entries.forEach(e=>log(e.msg,e.type));
+  }
+
+  function showFinModal(pi){
+    const st=gameState; if(!st) return;
+    const p=st.players[pi]||{}; if(!p.name) return;
+    const pii=getPI(p),me=getExp(p),cf=getCF(p);
+    $("fin-title").textContent=(p.isAI?"🤖":p.emoji||"")+" "+p.name+" の財務諸表";
+    $("fin-body").innerHTML=`
+      <div style="font-size:9px;font-weight:600;color:#fbbf24;margin-bottom:3px;">損益計算書（月次）</div>
+      ${[["給与収入",p.sal,true],["受動的収入",pii,true],null,
+        ["税金",p.exp?.tax],["住宅ローン",p.exp?.mort],["車ローン",p.exp?.car],
+        ["クレジット",p.exp?.cc],["その他",p.exp?.misc],["子供("+(p.kids||0)+"人)",(p.exp?.child||0)*(p.kids||0)],
+        ["銀行ローン利息",p.exp?.bankLoan||0],null,["月間CF",cf,false,true]
+      ].map(r=>{
+        if(!r)return`<div style="height:1px;background:rgba(255,255,255,0.07);margin:3px 0;"></div>`;
+        const[l,v,pos,tot]=r;
+        return`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);${tot?"font-weight:700;":""}">
+          <span style="color:#94a3b8;">${l}</span>
+          <span style="color:${tot?(v>=0?"#4ade80":"#f87171"):pos?"#4ade80":"#f87171"};">¥${Math.abs(v||0).toLocaleString()}</span>
+        </div>`;
+      }).join("")}
+      ${(p.assets||[]).length>0?`
+        <div style="font-size:9px;font-weight:600;color:#fbbf24;margin:8px 0 3px;">保有資産</div>
+        ${(p.assets||[]).map((a,idx)=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);">
+          <span style="color:#94a3b8;">${a.name}</span>
+          <span style="color:#4ade80;">+¥${a.cf}/月</span>
+        </div>`).join("")}
+      `:""}
+      ${Object.keys(p.stocks||{}).length>0?`
+        <div style="font-size:9px;font-weight:600;color:#fbbf24;margin:8px 0 3px;">株式</div>
+        ${Object.entries(p.stocks||{}).map(([sn,qty])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);">
+          <span style="color:#94a3b8;">${sn} (${qty}株)</span>
+        </div>`).join("")}
+      `:""}
+    `;
+    $("fin-modal").style.display="flex";
+  }
+
+  function showBankLoanModal(){
+    $("loan-modal").style.display="flex";
+  }
+  function showRepayModal(){
+    $("repay-modal").style.display="flex";
+  }
+
+  async function confirmLoan(){
+    const amt=parseInt($("loan-amount").value)||0;
+    if(amt>0&&amt%1000===0){ await takeBankLoan(myPlayerId,amt); }
+    else { alert("1000単位で入力してください"); return; }
+    $("loan-modal").style.display="none";
+  }
+  async function confirmRepay(){
+    const amt=parseInt($("repay-amount").value)||0;
+    if(amt>0&&amt%1000===0){ await repayLoan(myPlayerId,amt); }
+    else { alert("1000単位で入力してください"); return; }
+    $("repay-modal").style.display="none";
+  }
+
+  async function saveCurrentGame(){
+    if(!gameState||!roomId) return;
+    await saveGame(gameState);
+    alert("✅ セーブしました！\nルームID: "+roomId+"\nこのIDを控えておくと後で再開できます。");
+  }
+
+  // Expose to global scope for onclick handlers
+  window.doRoll=doRoll;
+  window.doCardAction=doCardAction;
+  window.doBuyStock=doBuyStock;
+  window.doEndTurn=doEndTurn;
+  window.sellAsset=sellAsset;
+  window.sellStock=sellStock;
+  window.showFinModal=showFinModal;
+  window.showBankLoanModal=showBankLoanModal;
+  window.showRepayModal=showRepayModal;
+  window.confirmLoan=confirmLoan;
+  window.confirmRepay=confirmRepay;
+  window.saveCurrentGame=saveCurrentGame;
+  window.createRoom=createRoom;
+  window.joinRoom=joinRoom;
+  window.loadSavedRoom=loadSavedRoom;
+  window.copyRoomId=()=>{navigator.clipboard.writeText(roomId||"");alert("ルームIDをコピーしました: "+roomId);};
+
+  // AI turn trigger when state changes
+  let lastPhase="", lastCi=-1;
+  setInterval(()=>{
+    if(!gameState||!canAct()) return;
+    const st=gameState;
+    const cp=st.players[st.ci];
+    if(!cp||!cp.isAI) return;
+    if(st.phase===lastPhase&&st.ci===lastCi) return;
+    lastPhase=st.phase; lastCi=st.ci;
+    setTimeout(runAITurn,1000);
+  },500);
+
+</script>
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#050c1a;color:#e2e8f0;font-family:'Segoe UI',sans-serif;height:100vh;overflow:hidden;}
+  button{cursor:pointer;}
+  select,input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:7px;color:#e2e8f0;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;}
+  .screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+  .card{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:28px 36px;width:100%;max-width:500px;box-shadow:0 20px 50px rgba(0,0,0,0.6);}
+  .title{font-size:36px;font-weight:800;color:#fbbf24;letter-spacing:4px;text-shadow:0 0 24px rgba(251,191,36,0.5);text-align:center;}
+  .subtitle{color:#94a3b8;font-size:12px;text-align:center;margin-bottom:16px;}
+  .btn-primary{width:100%;padding:11px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:9px;color:#0f172a;font-size:14px;font-weight:800;}
+  .btn-secondary{width:100%;padding:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:9px;color:#94a3b8;font-size:13px;}
+  .btn-danger{padding:5px 11px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:6px;color:#f87171;font-size:11px;}
+  .label{font-size:10px;color:#64748b;margin-bottom:3px;}
+  .section-title{font-size:11px;color:#fbbf24;font-weight:700;margin:14px 0 6px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;z-index:200;}
+  .modal{background:#0a1628;border-radius:14px;padding:20px;width:360px;max-height:80vh;overflow:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 50px rgba(0,0,0,0.7);}
+  .modal-title{color:#fbbf24;font-size:13px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+  #board{position:relative;width:680px;height:440px;flex-shrink:0;transform:scale(var(--bs,1));transform-origin:center center;}
+  #board-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden;background:#050c1a;border-radius:12px;border:2px solid rgba(255,255,255,0.06);}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
+  @keyframes spin{100%{transform:rotate(360deg)}}
+
+  /* Setup tabs */
+  .tab-btn{flex:1;padding:8px 4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:#64748b;font-size:11px;font-weight:400;}
+  .tab-btn.active{background:#fbbf24;border-color:#fbbf24;color:#0f172a;font-weight:700;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOBBY SCREEN ══ -->
+<div id="screen-lobby" class="screen" style="display:flex;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:50px;">💰</div>
+    <div class="title">CASHFLOW ONLINE</div>
+    <div class="subtitle">ホストがルームを作成 → IDを参加者に共有 → みんなでプレイ！</div>
+  </div>
+
+  <div class="card">
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:16px;">
+      <button class="tab-btn active" onclick="switchTab('create')">🆕 ルーム作成</button>
+      <button class="tab-btn" onclick="switchTab('join')">🚪 参加</button>
+      <button class="tab-btn" onclick="switchTab('load')">💾 ロード</button>
+    </div>
+
+    <!-- Create Tab -->
+    <div id="tab-create" class="tab-content active">
+      <div class="label">あなたの名前</div>
+      <input id="host-name" placeholder="ホストの名前" style="width:100%;margin-bottom:10px;">
+
+      <div class="label">職業を選ぶ</div>
+      <select id="host-job" style="width:100%;margin-bottom:10px;">
+        <option value="0">👨‍⚕️ 医師 （月給¥13,200 / 難しい）</option>
+        <option value="1">⚖️ 弁護士 （月給¥9,900）</option>
+        <option value="2" selected>💻 エンジニア （月給¥7,500 / おすすめ）</option>
+        <option value="3">📚 教師 （月給¥3,300）</option>
+        <option value="4">👮 警察官 （月給¥2,100）</option>
+        <option value="5">🚛 運転手 （月給¥2,100）</option>
+      </select>
+
+      <div class="label">AI対戦相手の数</div>
+      <select id="ai-count" style="width:100%;margin-bottom:16px;">
+        <option value="1">🤖×1 （合計2人）</option>
+        <option value="2" selected>🤖×2 （合計3人）</option>
+        <option value="3">🤖×3 （合計4人）</option>
+      </select>
+
+      <button class="btn-primary" onclick="createRoom()">🎮 ルームを作成してゲーム開始！</button>
+    </div>
+
+    <!-- Join Tab -->
+    <div id="tab-join" class="tab-content">
+      <div class="label">ルームID（ホストから受け取ったID）</div>
+      <input id="join-room-id" placeholder="例: ABC123" style="width:100%;margin-bottom:10px;text-transform:uppercase;">
+      <div class="label">あなたの名前</div>
+      <input id="join-name" placeholder="参加者の名前" style="width:100%;margin-bottom:14px;">
+      <button class="btn-primary" onclick="joinRoom()">🚪 ゲームに参加</button>
+      <div style="font-size:10px;color:#64748b;margin-top:8px;">※現在のバージョンではホストが全員を操作します。観戦モードで参加できます。</div>
+    </div>
+
+    <!-- Load Tab -->
+    <div id="tab-load" class="tab-content">
+      <div class="label">保存済みルームID</div>
+      <input id="load-room-id" placeholder="例: ABC123" style="width:100%;margin-bottom:10px;text-transform:uppercase;">
+      <button class="btn-primary" onclick="loadSavedRoom()">💾 ゲームをロードして再開</button>
+      <div style="font-size:10px;color:#64748b;margin-top:8px;">以前セーブしたゲームをルームIDで再開できます。</div>
+    </div>
+
+    <div style="margin-top:14px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 12px;font-size:10px;color:#93c5fd;line-height:1.7;">
+      <b>セットアップ手順：</b><br>
+      1. <a href="https://firebase.google.com" target="_blank" style="color:#60a5fa;">Firebase Console</a> でプロジェクト作成（無料）<br>
+      2. Realtime Database を有効化<br>
+      3. このHTMLファイルの firebaseConfig を書き換える<br>
+      4. <a href="https://pages.github.com" target="_blank" style="color:#60a5fa;">GitHub Pages</a> にアップロードしてURLを共有
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME SCREEN ══ -->
+<div id="screen-game" style="display:none;flex-direction:column;height:100vh;overflow:hidden;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#0a1628;border-bottom:1px solid rgba(251,191,36,0.18);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="color:#fbbf24;font-weight:800;font-size:13px;letter-spacing:2px;">💰 CASHFLOW</span>
+      <span id="room-id-display" style="font-size:9px;color:#64748b;"></span>
+      <button onclick="copyRoomId()" style="padding:2px 7px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);border-radius:4px;color:#fbbf24;font-size:8px;">IDをコピー</button>
+    </div>
+
+    <!-- My quick stats -->
+    <div id="header-turn" style="display:flex;align-items:center;gap:6px;border-radius:14px;padding:3px 10px;font-size:11px;border:1px solid;">
+      <span id="cur-player-name" style="font-weight:600;"></span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:4px;">
+      <div style="display:flex;gap:8px;margin-right:6px;">
+        <div style="text-align:center;">
+          <div style="font-size:7px;color:#64748b;">受動収入</div>
+          <div id="my-passive" style="font-size:9px;font-weight:700;color:#4ade80;"></div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:7px;color:#64748b;">月支出</div>
+          <div id="my-expense" style="font-size:9px;font-weight:700;color:#f87171;"></div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:7px;color:#64748b;">貯蓄</div>
+          <div id="my-save" style="font-size:9px;font-weight:700;color:#fbbf24;"></div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:7px;color:#64748b;">月CF</div>
+          <div id="my-cf" style="font-size:9px;font-weight:700;color:#4ade80;"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;min-width:90px;">
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+          <div id="progress-fill" style="height:100%;background:linear-gradient(90deg,#4ade80,#22d3ee);transition:width 0.5s;"></div>
+        </div>
+        <span id="my-pct" style="font-size:8px;color:#64748b;white-space:nowrap;"></span>
+      </div>
+      <button onclick="showBankLoanModal()" class="btn-danger" style="font-size:9px;padding:3px 7px;">🏦 ローン</button>
+      <button onclick="saveCurrentGame()" style="padding:3px 8px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);border-radius:5px;color:#4ade80;font-size:9px;">💾 セーブ</button>
+      <button onclick="document.getElementById('fin-modal').style.display='flex';showFinModal(0)" style="padding:3px 7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:9px;">📊 財務</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0;padding:5px 7px 5px;gap:5px;">
+
+    <!-- Board area -->
+    <div style="flex:1 1 0;min-height:0;" id="board-wrap">
+      <div id="board"></div>
+    </div>
+
+    <!-- Bottom strip -->
+    <div style="display:flex;gap:6px;height:108px;flex-shrink:0;">
+
+      <!-- My assets -->
+      <div style="flex:0 0 250px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+        <div style="font-size:9px;color:#fbbf24;font-weight:700;margin-bottom:5px;">📦 あなたの資産・株式</div>
+        <div id="my-assets" style="display:flex;flex-wrap:wrap;gap:3px;overflow:hidden;max-height:80px;"></div>
+      </div>
+
+      <!-- All players -->
+      <div style="flex:1;display:flex;gap:5px;overflow:auto;" id="player-list"></div>
+
+      <!-- Log -->
+      <div style="flex:0 0 185px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;">
+        <div style="font-size:8px;color:#475569;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;">ゲームログ</div>
+        <div id="game-log"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner overlay -->
+  <div id="winner-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;z-index:300;flex-direction:column;gap:16px;">
+    <div style="font-size:80px;">🏆</div>
+    <div id="winner-name" style="font-size:44px;color:#fbbf24;font-weight:800;"></div>
+    <div style="font-size:20px;color:#f59e0b;">ラットレース脱出！</div>
+    <button onclick="saveCurrentGame()" style="padding:10px 28px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);border-radius:10px;color:#4ade80;font-size:14px;font-weight:700;">💾 結果をセーブ</button>
+    <button onclick="location.reload()" style="padding:10px 28px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:14px;font-weight:800;">🔄 もう一度</button>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Financial modal -->
+<div id="fin-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="fin-title">財務諸表</span>
+      <button onclick="document.getElementById('fin-modal').style.display='none'" style="background:transparent;border:none;color:#64748b;font-size:16px;">✕</button>
+    </div>
+    <div id="fin-body"></div>
+  </div>
+</div>
+
+<!-- Stock purchase modal -->
+<div id="stock-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span>📈 <span id="stock-name"></span> — 株式購入</span>
+      <button onclick="document.getElementById('stock-modal').style.display='none'" style="background:transparent;border:none;color:#64748b;font-size:16px;">✕</button>
+    </div>
+    <div style="font-size:10px;color:#64748b;margin-bottom:10px;">1株 ¥<span id="stock-price"></span> ／ 最大 <span id="stock-max"></span>株</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;justify-content:center;">
+      <button onclick="document.getElementById('stock-qty').value=Math.max(1,parseInt(document.getElementById('stock-qty').value)-10)" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">-10</button>
+      <button onclick="document.getElementById('stock-qty').value=Math.max(1,parseInt(document.getElementById('stock-qty').value)-1)" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">-1</button>
+      <input id="stock-qty" type="number" value="1" min="1" style="width:60px;text-align:center;font-size:16px;font-weight:700;color:#fbbf24;">
+      <button onclick="document.getElementById('stock-qty').value=parseInt(document.getElementById('stock-qty').value)+1" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">+1</button>
+      <button onclick="document.getElementById('stock-qty').value=parseInt(document.getElementById('stock-qty').value)+10" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">+10</button>
+    </div>
+    <button onclick="doBuyStock()" style="width:100%;padding:10px;background:#10b981;border:none;border-radius:8px;color:white;font-weight:800;font-size:13px;">購入確定</button>
+  </div>
+</div>
+
+<!-- Bank loan modal -->
+<div id="loan-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span>🏦 銀行ローン（月利10%）</span>
+      <button onclick="document.getElementById('loan-modal').style.display='none'" style="background:transparent;border:none;color:#64748b;font-size:16px;">✕</button>
+    </div>
+    <div style="font-size:10px;color:#94a3b8;margin-bottom:10px;line-height:1.6;">
+      1000単位で借入できます。借りた金額の10%が毎月の支出に追加されます。<br>
+      例：¥3000借りる → 毎月¥300の利息が発生
+    </div>
+    <div class="label">借入金額（1000単位）</div>
+    <input id="loan-amount" type="number" value="1000" min="1000" step="1000" style="width:100%;margin-bottom:12px;">
+    <button onclick="confirmLoan()" style="width:100%;padding:10px;background:#f59e0b;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:13px;">借入する</button>
+  </div>
+</div>
+
+<!-- Repay loan modal -->
+<div id="repay-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span>💳 ローン返済</span>
+      <button onclick="document.getElementById('repay-modal').style.display='none'" style="background:transparent;border:none;color:#64748b;font-size:16px;">✕</button>
+    </div>
+    <div class="label">返済金額（1000単位）</div>
+    <input id="repay-amount" type="number" value="1000" min="1000" step="1000" style="width:100%;margin-bottom:12px;">
+    <button onclick="confirmRepay()" style="width:100%;padding:10px;background:#4ade80;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:13px;">返済する</button>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  function switchTab(tab) {
+    ["create","join","load"].forEach(t => {
+      document.getElementById("tab-"+t).classList.toggle("active", t===tab);
+      document.querySelectorAll(".tab-btn").forEach((btn,i) => {
+        if(["create","join","load"][i]===tab) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+    });
+  }
+
+  // Board scaling
+  function scaleBoardWrap() {
+    const wrap = document.getElementById("board-wrap");
+    const board = document.getElementById("board");
+    if(!wrap||!board) return;
+    const sw=wrap.clientWidth, sh=wrap.clientHeight;
+    const s = Math.min(sw/680, sh/440, 1);
+    board.style.setProperty("--bs", s);
+  }
+  window.addEventListener("resize", scaleBoardWrap);
+  setInterval(scaleBoardWrap, 500);
+</script>
+
+</body>
+</html>
