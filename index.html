@@ -384,6 +384,7 @@ function fbListen(callback){
 
 async function writeState(st){
   G.st=st;
+  aiScheduled=false;
   await rRef("state").set(st);
 }
 
@@ -481,7 +482,7 @@ function startGame(){
   buildBoardSpaces();
   renderAll();
   // Start Firebase listener
-  fbListen(st=>{G.st=st;renderAll();scheduleAI();});
+  fbListen(st=>{G.st=st;renderAll();aiScheduled=false;scheduleAI();});
   scheduleAI();
 }
 
@@ -968,25 +969,30 @@ function openFinModal(pi){
 function closeModal(id){document.getElementById(id).classList.remove("show");}
 
 // ── AI ──
-let aiRunning=false;
+let aiScheduled=false;
 function scheduleAI(){
   const st=G.st; if(!st||!G.isHost) return;
   const cp=st.players[st.ci]; if(!cp||!cp.isAI) return;
-  if(aiRunning) return;
+  if(st.winner) return;
+  if(aiScheduled) return;
+  aiScheduled=true;
   clearTimeout(G.aiTimer);
-  G.aiTimer=setTimeout(runAI,1200);
+  G.aiTimer=setTimeout(()=>{aiScheduled=false;runAI();},1200);
 }
 async function runAI(){
   const st=G.st; if(!st||!G.isHost) return;
-  const cp=st.players[st.ci]; if(!cp||!cp.isAI){aiRunning=false;return;}
-  aiRunning=true;
+  const cp=st.players[st.ci]; if(!cp||!cp.isAI) return;
+  if(st.winner) return;
   try{
-    if(st.phase==="roll")           { await doRoll(); }
-    else if(st.phase==="card"&&st.card){ await aiDoCard(); }
+    if(st.phase==="roll")               { await doRoll(); }
+    else if(st.phase==="card"&&st.card) { await aiDoCard(); }
     else if(st.phase==="stock"&&st.card){ await aiDoStock(); }
-    else if(st.phase==="end")       { await doEndTurn(); }
-  }catch(e){console.error("AI error:",e);}
-  aiRunning=false;
+    else if(st.phase==="end")           { await doEndTurn(); }
+    else{ setTimeout(()=>{ if(G.st&&G.st.players[G.st.ci]&&G.st.players[G.st.ci].isAI)doEndTurn(); },2000); }
+  }catch(e){
+    console.error("AI error:",e);
+    try{ await doEndTurn(); }catch(e2){}
+  }
 }
 async function aiDoCard(){
   const st=G.st; const c=cardById(st.card); if(!c) return;
