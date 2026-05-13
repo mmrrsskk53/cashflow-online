@@ -32,13 +32,13 @@ button{cursor:pointer;font-family:inherit;}
 .hbtn{padding:3px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:9px;}
 #main-area{flex:1;display:flex;flex-direction:column;min-height:0;padding:5px 7px;gap:5px;}
 #board-wrap{flex:1 1 0;min-height:0;background:#050c1a;border-radius:12px;border:2px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-#board-inner{position:relative;width:680px;height:440px;flex-shrink:0;}
+#board-inner{position:relative;width:1360px;height:880px;flex-shrink:0;}
 #bottom{display:flex;gap:6px;height:110px;flex-shrink:0;}
 #my-panel{flex:0 0 255px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;}
 #players-panel{flex:1;display:flex;gap:5px;overflow-x:auto;}
 #log-panel{flex:0 0 185px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;}
 /* Center action */
-#center-panel{position:absolute;left:78px;top:78px;right:78px;bottom:78px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
+#center-panel{position:absolute;left:142px;top:142px;right:142px;bottom:142px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
 /* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;z-index:200;}
 .overlay.show{display:flex;}
@@ -55,11 +55,31 @@ button{cursor:pointer;font-family:inherit;}
 /* Dice face */
 .die-face{font-size:48px;background:#111827;border-radius:12px;padding:5px 12px;border:2px solid rgba(255,255,255,0.12);line-height:1;user-select:none;}
 /* Animations */
+
+/* Token move animation */
+.token-moving { box-shadow: 0 0 20px #fbbf24, inset 0 0 15px rgba(251,191,36,0.3) !important; border-color: #fbbf24 !important; transform: scale(1.05); }
+@keyframes tokenBounce { 0%{transform:scale(1)} 50%{transform:scale(1.4) translateY(-4px)} 100%{transform:scale(1)} }
+@keyframes diceShake { 0%{transform:translate(-4px,-4px) rotate(-8deg)} 25%{transform:translate(4px,4px) rotate(8deg)} 50%{transform:translate(-4px,4px) rotate(-4deg)} 75%{transform:translate(4px,-4px) rotate(4deg)} 100%{transform:translate(0,0)} }
+@keyframes diceLand { 0%{transform:scale(1.6)} 60%{transform:scale(0.88)} 100%{transform:scale(1)} }
+@keyframes paydayFlash { 0%,100%{background:rgba(16,185,129,0.1)} 50%{background:rgba(16,185,129,0.4)} }
+@keyframes cardSlideIn { 0%{transform:translateX(40px);opacity:0} 100%{transform:translateX(0);opacity:1} }
+@keyframes btnPop { 0%{transform:scale(1)} 50%{transform:scale(0.93)} 100%{transform:scale(1)} }
+
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
 @keyframes spin{100%{transform:rotate(360deg)}}
 @keyframes fadeUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes glow{0%,100%{box-shadow:0 0 8px rgba(251,191,36,0.3)}50%{box-shadow:0 0 24px rgba(251,191,36,0.9)}}
 </style>
+<!-- Dice animation overlay -->
+<div id="dice-anim-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:20px;">
+  <div style="font-size:14px;color:#94a3b8;letter-spacing:2px;">🎲 サイコロを振っています...</div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="dice-anim-1" style="font-size:96px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
+    <div style="font-size:36px;color:#475569;">+</div>
+    <div id="dice-anim-2" style="font-size:96px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
+  </div>
+  <div id="dice-anim-tot" style="font-size:56px;font-weight:800;color:#fbbf24;transition:opacity 0.3s;opacity:0;"></div>
+</div>
 </head>
 <body>
 
@@ -151,8 +171,8 @@ button{cursor:pointer;font-family:inherit;}
         <div class="prog-bar" style="flex:1;"><div id="h-prog" class="prog-fill" style="width:0%;"></div></div>
         <span id="h-pct" style="font-size:8px;color:#64748b;white-space:nowrap;"></span>
       </div>
-      <button class="hbtn" onclick="showLoanModal()" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);">🏦 ローン</button>
-      <button class="hbtn" onclick="saveGame()" style="color:#4ade80;border-color:rgba(74,222,128,0.3);">💾 セーブ</button>
+      <button class="hbtn" onclick="SFX.click();showLoanModal()" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);">🏦 ローン</button>
+      <button class="hbtn" onclick="SFX.click();saveGame()" style="color:#4ade80;border-color:rgba(74,222,128,0.3);">💾 セーブ</button>
       <button class="hbtn" onclick="openFinModal(G.myIdx)">📊 財務</button>
     </div>
   </div>
@@ -490,7 +510,7 @@ function startGame(){
 }
 
 // ── BUILD BOARD SPACES (DOM) ──
-const BOARD_W=680,BOARD_H=440,SW=76,SH=76;
+const BOARD_W=1360,BOARD_H=880,SW=140,SH=140;
 function calcPos(i){
   if(i<=6)  return{x:i*(BOARD_W-SW)/6,y:0};
   if(i<=11) return{x:BOARD_W-SW,y:(i-6)*(BOARD_H-SH)/6};
@@ -512,10 +532,10 @@ function buildBoardSpaces(){
       `background:${bg};border:2px solid ${col}88;border-radius:9px;cursor:pointer;`+
       `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;`+
       `transition:all 0.15s;overflow:hidden;z-index:2;`;
-    d.innerHTML=`<div class="si-num" style="font-size:7px;color:rgba(255,255,255,0.28);font-weight:600;">${i}</div>`+
-      `<div style="font-size:20px;line-height:1;">${SICON[t]}</div>`+
-      `<div style="font-size:7px;color:${col};font-weight:700;text-align:center;line-height:1.2;">${{small:"小",big:"大",market:"市",payday:"給料日",charity:"寄付"}[t]}</div>`+
-      `<div class="si-tokens" style="display:flex;flex-wrap:wrap;gap:1px;justify-content:center;max-width:${SW-6}px;margin-top:1px;"></div>`;
+    d.innerHTML=`<div class="si-num" style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;">${i}</div>`+
+      `<div style="font-size:38px;line-height:1;">${SICON[t]}</div>`+
+      `<div style="font-size:12px;color:${col};font-weight:800;text-align:center;line-height:1.3;padding:0 4px;">${{small:"スモール",big:"ビッグ",market:"市場",payday:"給料日",charity:"寄付"}[t]}</div>`+
+      `<div class="si-tokens" style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:${SW-10}px;margin-top:3px;"></div>`;
     d.title=SLABEL[t]+": "+SDESC[t];
     d.addEventListener("mouseenter",()=>{d.style.background=col+"33";d.style.boxShadow=`0 0 8px ${col}77`;});
     d.addEventListener("mouseleave",()=>updateSpaceStyle(i));
@@ -532,7 +552,7 @@ function buildBoardSpaces(){
     c.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${SW}px;height:${SH}px;`+
       `background:linear-gradient(135deg,#1a2744,#080f1e);border:2px solid rgba(251,191,36,0.35);`+
       `border-radius:9px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none;`;
-    c.innerHTML=`<span style="font-size:26px;">⭐</span>`;
+    c.innerHTML=`<span style="font-size:50px;">⭐</span>`;
     inner.appendChild(c);
   });
   scaleBoardWrap();
@@ -553,7 +573,7 @@ function updateSpaceStyle(i){
   tokWrap.innerHTML="";
   (st.players||[]).filter(p=>p.pos===i).forEach(p=>{
     const tok=document.createElement("div");
-    tok.style.cssText=`width:18px;height:18px;border-radius:50%;background:${TC[p.id%6]};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:800;`;
+    tok.style.cssText=`width:32px;height:32px;border-radius:50%;background:${TC[p.id%6]};display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.3);`;
     tok.textContent=p.isAI?"🤖":p.name[0];
     tokWrap.appendChild(tok);
   });
@@ -636,7 +656,7 @@ function renderCenter(st){
         <div class="die-face">${d?df[d.d2]:"⚄"}</div>
         ${d?`<span style="font-size:36px;font-weight:800;color:#fbbf24;animation:fadeUp 0.3s ease;">= ${d.tot}</span>`:""}
       </div>
-      ${isMyTurn?`<button onclick="doRoll()" style="padding:10px 30px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:14px;font-weight:800;animation:glow 2s infinite;">🎲 ダイスを振る</button>`
+      ${isMyTurn?`<button onclick="SFX.roll();doRoll()" style="padding:10px 30px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:14px;font-weight:800;animation:glow 2s infinite;cursor:pointer;">🎲 ダイスを振る</button>`
         :`<div style="color:#64748b;font-size:11px;">${cp.name} のターンを待っています...</div>`}
       <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:4px;">${cp.emoji||""} ${cp.name}（${cp.job}）のターン</div>`;
   } else if(st.phase==="card"&&st.card){
@@ -660,9 +680,9 @@ function renderCenter(st){
         ${isMyTurn?`
         <div style="display:flex;gap:6px;">
           ${ct!=="mkt"?`
-            <button onclick="doCardAction('buy')" ${!canBuy?"disabled":""} style="padding:5px 13px;background:${canBuy?"#10b981":"#374151"};border:none;border-radius:6px;color:${canBuy?"white":"#64748b"};font-weight:700;cursor:${canBuy?"pointer":"not-allowed"};font-size:10px;">${c.kind==="stock"?"株を購入":"購入する"}</button>
-            <button onclick="doCardAction('skip')" style="padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:10px;">見送る</button>
-          `:`<button onclick="doCardAction('apply')" style="padding:5px 13px;background:#10b981;border:none;border-radius:6px;color:white;font-weight:700;cursor:pointer;font-size:10px;">カードを適用</button>`}
+            <button onclick="SFX.click();doCardAction('buy')" ${!canBuy?"disabled":""} style="padding:5px 13px;background:${canBuy?"#10b981":"#374151"};border:none;border-radius:6px;color:${canBuy?"white":"#64748b"};font-weight:700;cursor:${canBuy?"pointer":"not-allowed"};font-size:10px;animation:${canBuy?"":"none"};">${c.kind==="stock"?"株を購入":"購入する"}</button>
+            <button onclick="SFX.skip();doCardAction('skip')" style="padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:10px;">見送る</button>
+          `:`<button onclick="SFX.good();doCardAction('apply')" style="padding:5px 13px;background:#10b981;border:none;border-radius:6px;color:white;font-weight:700;cursor:pointer;font-size:10px;">カードを適用</button>`}
         </div>`:`<div style="color:#64748b;font-size:10px;">${cp.name}の行動を待っています...</div>`}
       </div>`;
   } else if(st.phase==="end"){
@@ -672,7 +692,7 @@ function renderCenter(st){
         <div style="font-size:36px;">✅</div>
         <p style="color:#94a3b8;margin:0;font-size:11px;">ターン終了</p>
         <p style="color:#64748b;font-size:9px;margin:0;">次: ${next.isAI?"🤖":next.emoji||""} ${next.name||""}</p>
-        ${isMyTurn?`<button onclick="doEndTurn()" style="padding:7px 22px;background:#3b82f6;border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px;">次のプレイヤーへ →</button>`:""}
+        ${isMyTurn?`<button onclick="SFX.select();doEndTurn()" style="padding:7px 22px;background:#3b82f6;border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px;">次のプレイヤーへ →</button>`:""}
       </div>`;
   }
 }
@@ -747,22 +767,30 @@ function renderMyAssets(st){
 // ── GAME ACTIONS ──
 async function doRoll(){
   const st=G.st; if(!st||st.phase!=="roll") return;
+  SFX.roll();
   const d1=Math.ceil(Math.random()*6),d2=Math.ceil(Math.random()*6),tot=d1+d2;
+  // Show dice animation then move token
+  showDiceAnim(d1,d2,null);
+  await new Promise(r=>setTimeout(r,1400));
   const players=clonePlrs(st.players);
   const ci=st.ci; let p=players[ci];
   const prev=p.pos, next=(prev+tot)%N;
+  // Animate token movement step by step
+  await new Promise(resolve=>{
+    animateTokenMove(p.id,prev,next<prev?next+(prev-next<next?0:24):next,tot,resolve);
+  });
   p.pos=next;
-  if(next<=prev&&tot>0){const cf=getCF(p);p.save+=cf;addLog(p.name+" 給料日 +¥"+cf.toLocaleString(),"pay");}
+  if(next<=prev&&tot>0){const cf=getCF(p);p.save+=cf;SFX.payday();addLog(p.name+" 給料日 +¥"+cf.toLocaleString(),"pay");}
   if(p.layoff>0){p.layoff--;players[ci]=p;await writeState({...st,players,phase:"end",dice:{d1,d2,tot}});addLog(p.name+" リストラ中スキップ","warn");return;}
   players[ci]=p;
   const s2=STYPE[next];
   addLog(p.name+" →"+tot+" マス"+next+"「"+SLABEL[s2]+"」","roll");
   let card=null,ctype="",phase="end";
   const dk={s:[...st.dk.s],b:[...st.dk.b],m:[...st.dk.m]};
-  if(s2==="small"){card=dk.s[0];dk.s=[...dk.s.slice(1),dk.s[0]];ctype="small";phase="card";}
-  else if(s2==="big"){card=dk.b[0];dk.b=[...dk.b.slice(1),dk.b[0]];ctype="big";phase="card";}
-  else if(s2==="market"){card=dk.m[0];dk.m=[...dk.m.slice(1),dk.m[0]];ctype="mkt";phase="card";}
-  else if(s2==="charity"){const amt=Math.floor(p.sal*0.1);players[ci].save=Math.max(0,players[ci].save-amt);addLog(p.name+" チャリティー¥"+amt,"warn");}
+  if(s2==="small"){card=dk.s[0];dk.s=[...dk.s.slice(1),dk.s[0]];ctype="small";phase="card";SFX.card();}
+  else if(s2==="big"){card=dk.b[0];dk.b=[...dk.b.slice(1),dk.b[0]];ctype="big";phase="card";SFX.card();}
+  else if(s2==="market"){card=dk.m[0];dk.m=[...dk.m.slice(1),dk.m[0]];ctype="mkt";phase="card";SFX.card();}
+  else if(s2==="charity"){const amt=Math.floor(p.sal*0.1);players[ci].save=Math.max(0,players[ci].save-amt);SFX.charity();addLog(p.name+" チャリティー¥"+amt,"warn");}
   await writeState({...st,players,phase,card,ctype,dice:{d1,d2,tot},dk});
 }
 
@@ -777,7 +805,7 @@ async function doCardAction(act){
     if(c.kind==="property"||c.kind==="biz"){
       if(p.save>=c.down){
         p.save-=c.down;p.assets=[...(p.assets||[]),{...c,uid:c.id+Date.now()}];
-        players[ci]=p;addLog(p.name+" 「"+c.name+"」購入 +¥"+c.cf+"/月","ok");
+        players[ci]=p;SFX.buy();addLog(p.name+" 「"+c.name+"」購入 +¥"+c.cf+"/月","ok");
         const ns={...st,players,phase:"end",card:null,ctype:""};
         await writeState(ns);await checkWin(ns,ci);return;
       }else{addLog("資金不足 頭金¥"+c.down+"必要","err");}
@@ -787,7 +815,7 @@ async function doCardAction(act){
       if(c.carCost)p.exp={...p.exp,car:p.exp.car+c.carCost};
       players[ci]=p;addLog(p.name+" 「"+c.name+"」ムダ遣い","warn");
     }
-  }else{addLog(p.name+" 「"+c.name+"」見送り","info");}
+  }else{SFX.skip();addLog(p.name+" 「"+c.name+"」見送り","info");}
   players[ci]=p;
   await writeState({...st,players,phase:"end",card:null,ctype:""});
 }
@@ -804,7 +832,7 @@ function openStockModal(c,p){
   updateStockTotal();
   document.getElementById("stock-overlay").classList.add("show");
 }
-function adjQty(v){const el=document.getElementById("stock-qty");el.value=Math.max(1,parseInt(el.value||1)+v);updateStockTotal();}
+function adjQty(v){const el=document.getElementById("stock-qty");el.value=Math.max(1,parseInt(el.value||1)+v);updateStockTotal();if(v>0)SFX.plus();else SFX.minus();}
 function updateStockTotal(){
   if(!_stockCard)return;
   const qty=parseInt(document.getElementById("stock-qty").value)||0;
@@ -836,16 +864,16 @@ async function doApplyMkt(){
   const ci=st.ci; let mfx=st.mfx||null;
   if(mc.who==="current"){
     let p=players[ci];
-    if(mc.fx==="child"){p.kids=(p.kids||0)+1;addLog(p.name+" 子供誕生！","info");}
-    if(mc.fx==="expense"){p.save=Math.max(0,p.save-mc.amt);addLog(p.name+" 出費¥"+mc.amt,"warn");}
-    if(mc.fx==="bonus"){p.save+=mc.amt;addLog(p.name+" ボーナス+¥"+mc.amt,"ok");}
-    if(mc.fx==="layoff"){p.layoff=2;addLog(p.name+" リストラ！2ターン休み","err");}
+    if(mc.fx==="child"){p.kids=(p.kids||0)+1;SFX.good();addLog(p.name+" 子供誕生！","info");}
+    if(mc.fx==="expense"){p.save=Math.max(0,p.save-mc.amt);SFX.bad();addLog(p.name+" 出費¥"+mc.amt,"warn");}
+    if(mc.fx==="bonus"){p.save+=mc.amt;SFX.good();addLog(p.name+" ボーナス+¥"+mc.amt,"ok");}
+    if(mc.fx==="layoff"){p.layoff=2;SFX.bad();addLog(p.name+" リストラ！2ターン休み","err");}
     players[ci]=p;
   }else{
-    if(mc.fx==="re_up"){mfx={type:"re_up",mul:mc.mul};addLog("不動産価格上昇！130%売却可","ok");}
-    if(mc.fx==="st_up"){mfx={type:"st_up",mul:mc.mul};addLog("株価急騰！"+mc.mul+"倍売却可","ok");}
-    if(mc.fx==="st_down"){addLog("株価暴落！","err");}
-    if(mc.fx==="rate_up"){players.forEach(p=>{p.exp={...p.exp,mort:Math.floor(p.exp.mort*1.1)};});addLog("金利上昇！全員ローン10%増","warn");}
+    if(mc.fx==="re_up"){mfx={type:"re_up",mul:mc.mul};SFX.good();addLog("不動産価格上昇！130%売却可","ok");}
+    if(mc.fx==="st_up"){mfx={type:"st_up",mul:mc.mul};SFX.good();addLog("株価急騰！"+mc.mul+"倍売却可","ok");}
+    if(mc.fx==="st_down"){SFX.bad();addLog("株価暴落！","err");}
+    if(mc.fx==="rate_up"){players.forEach(p=>{p.exp={...p.exp,mort:Math.floor(p.exp.mort*1.1)};});SFX.bad();addLog("金利上昇！全員ローン10%増","warn");}
   }
   await writeState({...st,players,mfx,phase:"end",card:null,ctype:""});
 }
@@ -864,7 +892,7 @@ async function doSellAsset(idx){
   let price=a.cost||0;
   if(st.mfx&&st.mfx.type==="re_up"&&(a.kind==="property"||a.kind==="biz"))price=Math.floor(price*st.mfx.mul);
   p.save+=price;p.assets=p.assets.filter((_,i)=>i!==idx);
-  players[G.myIdx]=p;addLog(p.name+" 「"+a.name+"」¥"+price.toLocaleString()+"売却","info");
+  players[G.myIdx]=p;SFX.sell();addLog(p.name+" 「"+a.name+"」¥"+price.toLocaleString()+"売却","info");
   const ns={...st,players};await writeState(ns);await checkWin(ns,G.myIdx);
 }
 
@@ -877,7 +905,7 @@ async function doSellStock(sname){
   let price=sc.price||0;
   if(st.mfx&&st.mfx.type==="st_up")price=Math.floor(price*st.mfx.mul);
   const total=qty*price;p.save+=total;delete p.stocks[sname];
-  players[G.myIdx]=p;addLog(p.name+" "+sname+" "+qty+"株¥"+total+"売却","ok");
+  players[G.myIdx]=p;SFX.sell();addLog(p.name+" "+sname+" "+qty+"株¥"+total+"売却","ok");
   await writeState({...st,players});
 }
 
@@ -885,7 +913,7 @@ async function checkWin(st,idx){
   const p=st.players[idx];
   if(getPI(p)>=getExp(p)){
     await writeState({...st,winner:p.name});
-    addLog("🎉 "+p.name+" ラットレース脱出！","win");
+    SFX.win();addLog("🎉 "+p.name+" ラットレース脱出！","win");
   }
 }
 
@@ -899,7 +927,7 @@ async function confirmLoan(){
   const players=clonePlrs(st.players);
   const p=players[G.myIdx];
   p.save+=amt;p.bankLoan=(p.bankLoan||0)+amt;p.exp={...p.exp,bankLoan:((p.exp.bankLoan||0)+amt*0.1)};
-  players[G.myIdx]=p;addLog(p.name+" 銀行ローン¥"+amt+"借入（月利10%）","warn");
+  players[G.myIdx]=p;SFX.bad();addLog(p.name+" 銀行ローン¥"+amt+"借入（月利10%）","warn");
   await writeState({...st,players});
 }
 async function confirmRepay(){
@@ -912,7 +940,7 @@ async function confirmRepay(){
   const actual=Math.min(amt,p.bankLoan||0);
   if(p.save<actual){addLog("返済資金不足","err");return;}
   p.save-=actual;p.bankLoan=Math.max(0,(p.bankLoan||0)-actual);p.exp={...p.exp,bankLoan:Math.max(0,(p.exp.bankLoan||0)-actual*0.1)};
-  players[G.myIdx]=p;addLog(p.name+" ローン¥"+actual+"返済","ok");
+  players[G.myIdx]=p;SFX.good();addLog(p.name+" ローン¥"+actual+"返済","ok");
   await writeState({...st,players});
 }
 
@@ -1028,6 +1056,98 @@ async function aiDoStock(){
     players[st.ci]=np;addLog("🤖 "+np.name+" "+c.name+" "+qty+"株購入","info");
     await writeState({...st,players,phase:"end",card:null,ctype:""});
   }else{await writeState({...st,phase:"end",card:null,ctype:""});}
+}
+
+
+// ── AUDIO ENGINE ──
+const SFX=(()=>{
+  let ctx=null;
+  const ac=()=>{if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();return ctx;};
+  const tone=(f,tp,dur,vol=0.15,d=0)=>{try{const c=ac(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=tp;o.frequency.value=f;const t=c.currentTime+d;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.01);g.gain.exponentialRampToValueAtTime(0.001,t+dur);o.start(t);o.stop(t+dur+0.05);}catch(e){}};
+  const noise=(dur,vol=0.07,d=0)=>{try{const c=ac(),buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate),da=buf.getChannelData(0);for(let i=0;i<da.length;i++)da[i]=Math.random()*2-1;const src=c.createBufferSource(),g=c.createGain();src.buffer=buf;src.connect(g);g.connect(c.destination);const t=c.currentTime+d;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);src.start(t);src.stop(t+dur+0.05);}catch(e){}};
+  return {
+    roll()   { for(let i=0;i<8;i++){noise(0.04,0.14,i*0.06);tone(180+Math.random()*400,"square",0.03,0.07,i*0.06+0.01);} },
+    move()   { tone(520,"sine",0.06,0.1);noise(0.03,0.04); },
+    payday() { [523,659,784,1047].forEach((f,i)=>tone(f,"sine",0.18,0.16,i*0.08)); },
+    buy()    { tone(880,"sine",0.1,0.18);tone(1100,"sine",0.09,0.14,0.07);tone(1320,"sine",0.12,0.18,0.13); },
+    sell()   { tone(660,"sine",0.09,0.15);tone(440,"sine",0.1,0.12,0.08); },
+    skip()   { tone(320,"triangle",0.1,0.09); },
+    bad()    { tone(160,"sawtooth",0.18,0.14);tone(130,"sawtooth",0.22,0.12,0.12); },
+    good()   { tone(660,"sine",0.09,0.13);tone(880,"sine",0.09,0.13,0.06);tone(1100,"sine",0.1,0.15,0.12); },
+    win()    { [523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,"sine",0.22,0.18,i*0.1)); },
+    charity(){ tone(380,"triangle",0.12,0.1);tone(300,"triangle",0.12,0.09,0.1); },
+    card()   { noise(0.05,0.08);tone(420,"sine",0.07,0.09,0.03); },
+    click()  { tone(600,"sine",0.04,0.08); },
+    plus()   { tone(800,"sine",0.06,0.12);tone(1000,"sine",0.05,0.1,0.05); },
+    minus()  { tone(400,"sine",0.06,0.1);tone(300,"sine",0.05,0.08,0.05); },
+    select() { tone(700,"sine",0.05,0.1);tone(900,"sine",0.04,0.08,0.04); },
+  };
+})();
+
+// ── DICE ANIMATION ──
+let diceAnimTimer=null;
+function showDiceAnim(d1,d2,onDone){
+  const faces=["","⚀","⚁","⚂","⚃","⚄","⚅"];
+  const overlay=document.getElementById("dice-anim-overlay");
+  const d1el=document.getElementById("dice-anim-1");
+  const d2el=document.getElementById("dice-anim-2");
+  const totEl=document.getElementById("dice-anim-tot");
+  overlay.style.display="flex";
+  totEl.style.opacity="0";
+  SFX.roll();
+  let count=0;
+  const total=18;
+  function tick(){
+    d1el.textContent=faces[Math.ceil(Math.random()*6)];
+    d2el.textContent=faces[Math.ceil(Math.random()*6)];
+    d1el.style.transform=`rotate(${(Math.random()-0.5)*30}deg) scale(${0.9+Math.random()*0.2})`;
+    d2el.style.transform=`rotate(${(Math.random()-0.5)*30}deg) scale(${0.9+Math.random()*0.2})`;
+    count++;
+    if(count<total){
+      diceAnimTimer=setTimeout(tick, 40+count*8);
+    } else {
+      d1el.textContent=faces[d1];d2el.textContent=faces[d2];
+      d1el.style.transform="rotate(0deg) scale(1)";
+      d2el.style.transform="rotate(0deg) scale(1)";
+      totEl.textContent="= "+(d1+d2);
+      totEl.style.opacity="1";
+      setTimeout(()=>{
+        overlay.style.display="none";
+        if(onDone) onDone();
+      },800);
+    }
+  }
+  tick();
+}
+
+// ── TOKEN MOVE ANIMATION ──
+const movingTokens={}; // playerId -> DOM element overlay
+function animateTokenMove(playerId,fromPos,toPos,steps,onDone){
+  // Highlight each space one by one
+  let cur=fromPos, step=0;
+  function next(){
+    // Remove prev highlight
+    const prevEl=document.querySelector(`.bspace[data-idx="${cur}"]`);
+    if(prevEl) prevEl.classList.remove("token-moving");
+    if(step>=steps){ if(onDone)onDone(); return; }
+    cur=(cur+1)%24; step++;
+    SFX.move();
+    // Highlight current space
+    const el=document.querySelector(`.bspace[data-idx="${cur}"]`);
+    if(el){
+      el.classList.add("token-moving");
+      // Bounce the token inside this space
+      const tokWrap=el.querySelector(".si-tokens");
+      if(tokWrap){
+        tokWrap.querySelectorAll("div").forEach(t=>{
+          t.style.animation="tokenBounce 0.2s ease";
+          setTimeout(()=>{t.style.animation="";},200);
+        });
+      }
+    }
+    setTimeout(next, 220);
+  }
+  next();
 }
 
 // ── INIT ──
