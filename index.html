@@ -32,13 +32,13 @@ button{cursor:pointer;font-family:inherit;}
 .hbtn{padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;font-size:12px;}
 #main-area{flex:1;display:flex;flex-direction:column;min-height:0;padding:5px 7px;gap:5px;}
 #board-wrap{flex:1 1 0;min-height:0;background:#050c1a;border-radius:12px;border:2px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-#board-inner{position:relative;width:1900px;height:600px;flex-shrink:0;}
-#bottom{display:flex;gap:8px;height:160px;flex-shrink:0;}
+#board-inner{position:relative;width:1900px;height:520px;flex-shrink:0;}
+#bottom{display:flex;gap:8px;height:150px;flex-shrink:0;}
 #my-panel{flex:0 0 340px;background:#0a1628;border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;}
 #players-panel{flex:1;display:flex;gap:5px;overflow-x:auto;}
 #log-panel{flex:0 0 280px;background:#0a1628;border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;cursor:pointer;}
 /* Center action */
-#center-panel{position:absolute;left:138px;top:138px;right:138px;bottom:138px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
+#center-panel{position:absolute;left:134px;top:134px;right:134px;bottom:134px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
 /* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;z-index:200;}
 .overlay.show{display:flex;}
@@ -286,7 +286,7 @@ const FB_CONFIG = {
 // ── GAME DATA ──
 const TC=["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899"];
 const N=24;
-const STYPE={0:"payday",1:"small",2:"small",3:"big",4:"market",5:"small",6:"small",7:"payday",8:"big",9:"market",10:"small",11:"charity",12:"payday",13:"small",14:"big",15:"market",16:"small",17:"small",18:"payday",19:"small",20:"charity",21:"small",22:"big",23:"market"};
+const STYPE={0:"payday",1:"small",2:"small",3:"big",4:"market",5:"small",6:"small",7:"big",8:"market",9:"payday",10:"small",11:"charity",12:"payday",13:"small",14:"big",15:"market",16:"small",17:"small",18:"big",19:"market",20:"small",21:"payday",22:"charity",23:"small"};
 const SCOL={small:"#3b82f6",big:"#8b5cf6",market:"#f59e0b",payday:"#10b981",charity:"#ec4899"};
 const SICON={small:"🔵",big:"🟣",market:"🟡",payday:"💰",charity:"🩷"};
 const SLABEL={small:"スモールディール",big:"ビッグディール",market:"マーケット",payday:"給料日",charity:"寄付"};
@@ -521,12 +521,16 @@ function startGame(){
 }
 
 // ── BUILD BOARD SPACES (DOM) ──
-const BOARD_W=1900,BOARD_H=600,SW=136,SH=136;
+const BOARD_W=1900,BOARD_H=520,SW=132,SH=132;
 function calcPos(i){
-  if(i<=7)  return{x:i*(BOARD_W-SW)/7, y:0};
-  if(i<=11) return{x:BOARD_W-SW, y:(i-7)*(BOARD_H-SH)/4};
-  if(i<=19) return{x:(19-i)*(BOARD_W-SW)/7, y:BOARD_H-SH};
-  return{x:0, y:(24-i)*(BOARD_H-SH)/4};
+  // 上10(0-9): 左→右
+  if(i<=9)  return{x:i*(BOARD_W-SW)/9, y:0};
+  // 右2(10-11): 上→下
+  if(i<=11) return{x:BOARD_W-SW, y:(i-9)*(BOARD_H-SH)/3};
+  // 下10(12-21): 右→左
+  if(i<=21) return{x:(21-i)*(BOARD_W-SW)/9, y:BOARD_H-SH};
+  // 左2(22-23): 下→上
+  return{x:0, y:(24-i)*(BOARD_H-SH)/3};
 }
 
 function buildBoardSpaces(){
