@@ -25,35 +25,35 @@ button{cursor:pointer;font-family:inherit;}
 .info-box{background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 12px;font-size:10px;color:#93c5fd;line-height:1.7;margin-top:14px;}
 /* Game */
 #game{display:none;flex-direction:column;height:100vh;overflow:hidden;}
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#0a1628;border-bottom:1px solid rgba(251,191,36,0.18);flex-shrink:0;gap:8px;flex-wrap:wrap;}
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:#0a1628;border-bottom:1px solid rgba(251,191,36,0.18);flex-shrink:0;gap:10px;flex-wrap:wrap;}
 #hdr-left{display:flex;align-items:center;gap:6px;}
-#hdr-mid{display:flex;align-items:center;gap:6px;border-radius:14px;padding:3px 10px;border:1px solid;font-size:11px;}
+#hdr-mid{display:flex;align-items:center;gap:8px;border-radius:14px;padding:5px 12px;border:1px solid;font-size:14px;}
 #hdr-right{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.hbtn{padding:3px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:9px;}
+.hbtn{padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;font-size:12px;}
 #main-area{flex:1;display:flex;flex-direction:column;min-height:0;padding:5px 7px;gap:5px;}
 #board-wrap{flex:1 1 0;min-height:0;background:#050c1a;border-radius:12px;border:2px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-#board-inner{position:relative;width:1360px;height:880px;flex-shrink:0;}
-#bottom{display:flex;gap:6px;height:110px;flex-shrink:0;}
-#my-panel{flex:0 0 255px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;}
+#board-inner{position:relative;width:1800px;height:660px;flex-shrink:0;}
+#bottom{display:flex;gap:8px;height:160px;flex-shrink:0;}
+#my-panel{flex:0 0 340px;background:#0a1628;border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;}
 #players-panel{flex:1;display:flex;gap:5px;overflow-x:auto;}
-#log-panel{flex:0 0 185px;background:#0a1628;border-radius:9px;padding:7px 9px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;}
+#log-panel{flex:0 0 280px;background:#0a1628;border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;cursor:pointer;}
 /* Center action */
 #center-panel{position:absolute;left:142px;top:142px;right:142px;bottom:142px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
 /* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;z-index:200;}
 .overlay.show{display:flex;}
-.modal-box{background:#0a1628;border-radius:14px;padding:20px;width:340px;max-height:80vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);}
-.modal-title{color:#fbbf24;font-size:13px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.modal-box{background:#0a1628;border-radius:14px;padding:24px;width:500px;max-height:85vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);}
+.modal-title{color:#fbbf24;font-size:17px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
 .close-btn{background:transparent;border:none;color:#64748b;font-size:16px;}
 /* Progress */
-.prog-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+.prog-bar{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;}
 .prog-fill{height:100%;background:linear-gradient(90deg,#4ade80,#22d3ee);transition:width 0.5s;}
 /* Status */
-#status-bar{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 16px;font-size:11px;color:#94a3b8;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s;}
+#status-bar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 18px;font-size:13px;color:#94a3b8;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s;}
 /* Winner */
 #winner-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;z-index:300;flex-direction:column;gap:14px;}
 /* Dice face */
-.die-face{font-size:48px;background:#111827;border-radius:12px;padding:5px 12px;border:2px solid rgba(255,255,255,0.12);line-height:1;user-select:none;}
+.die-face{font-size:62px;background:#111827;border-radius:12px;padding:5px 12px;border:2px solid rgba(255,255,255,0.12);line-height:1;user-select:none;}
 /* Animations */
 
 /* Token move animation */
@@ -72,13 +72,13 @@ button{cursor:pointer;font-family:inherit;}
 </style>
 <!-- Dice animation overlay -->
 <div id="dice-anim-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:20px;">
-  <div style="font-size:14px;color:#94a3b8;letter-spacing:2px;">🎲 サイコロを振っています...</div>
+  <div style="font-size:16px;color:#94a3b8;letter-spacing:2px;">🎲 サイコロを振っています...</div>
   <div style="display:flex;align-items:center;gap:20px;">
-    <div id="dice-anim-1" style="font-size:96px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
-    <div style="font-size:36px;color:#475569;">+</div>
-    <div id="dice-anim-2" style="font-size:96px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
+    <div id="dice-anim-1" style="font-size:125px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
+    <div style="font-size:40px;color:#475569;">+</div>
+    <div id="dice-anim-2" style="font-size:125px;line-height:1;background:#111827;border-radius:20px;padding:10px 20px;border:3px solid #3b82f6;box-shadow:0 0 30px rgba(59,130,246,0.6);transition:transform 0.05s;">⚄</div>
   </div>
-  <div id="dice-anim-tot" style="font-size:56px;font-weight:800;color:#fbbf24;transition:opacity 0.3s;opacity:0;"></div>
+  <div id="dice-anim-tot" style="font-size:73px;font-weight:800;color:#fbbf24;transition:opacity 0.3s;opacity:0;"></div>
 </div>
 </head>
 <body>
@@ -86,9 +86,9 @@ button{cursor:pointer;font-family:inherit;}
 <!-- ══ LOBBY ══ -->
 <div id="lobby">
   <div style="text-align:center;margin-bottom:18px;">
-    <div style="font-size:48px;">💰</div>
-    <div style="font-size:32px;font-weight:800;color:#fbbf24;letter-spacing:4px;text-shadow:0 0 20px rgba(251,191,36,0.5);">CASHFLOW ONLINE</div>
-    <div style="color:#94a3b8;font-size:12px;margin-top:4px;">ホストがルームを作成 → IDを参加者に共有 → みんなでプレイ！</div>
+    <div style="font-size:62px;">💰</div>
+    <div style="font-size:42px;font-weight:800;color:#fbbf24;letter-spacing:4px;text-shadow:0 0 20px rgba(251,191,36,0.5);">CASHFLOW ONLINE</div>
+    <div style="color:#94a3b8;font-size:16px;margin-top:4px;">ホストがルームを作成 → IDを参加者に共有 → みんなでプレイ！</div>
   </div>
   <div class="lobby-card">
     <div class="tab-row">
@@ -117,7 +117,7 @@ button{cursor:pointer;font-family:inherit;}
         <option value="3">🤖×3（合計4人）</option>
       </select>
       <button class="btn-gold" onclick="createRoom()">🎮 ルームを作成してゲーム開始！</button>
-      <div id="create-error" style="color:#f87171;font-size:10px;margin-top:6px;display:none;"></div>
+      <div id="create-error" style="color:#f87171;font-size:42px;margin-top:6px;display:none;"></div>
     </div>
 
     <!-- Join -->
@@ -127,7 +127,7 @@ button{cursor:pointer;font-family:inherit;}
       <div class="lbl">あなたの名前</div>
       <input id="join-name" placeholder="参加者の名前">
       <button class="btn-blue" onclick="joinRoom()">🚪 ゲームに参加（観戦）</button>
-      <div style="font-size:10px;color:#64748b;margin-top:8px;">※現バージョンはホストが操作、参加者はリアルタイム観戦できます</div>
+      <div style="font-size:42px;color:#64748b;margin-top:8px;">※現バージョンはホストが操作、参加者はリアルタイム観戦できます</div>
     </div>
 
     <!-- Load -->
@@ -135,7 +135,7 @@ button{cursor:pointer;font-family:inherit;}
       <div class="lbl">保存済みルームID</div>
       <input id="load-room-id" placeholder="例: ABC123" style="text-transform:uppercase;">
       <button class="btn-gold" onclick="loadRoom()">💾 ゲームをロードして再開</button>
-      <div style="font-size:10px;color:#64748b;margin-top:8px;">セーブ時のルームIDで途中から再開できます</div>
+      <div style="font-size:42px;color:#64748b;margin-top:8px;">セーブ時のルームIDで途中から再開できます</div>
     </div>
 
     <div class="info-box">
@@ -153,8 +153,8 @@ button{cursor:pointer;font-family:inherit;}
   <!-- Header -->
   <div id="hdr">
     <div id="hdr-left">
-      <span style="color:#fbbf24;font-weight:800;font-size:13px;letter-spacing:2px;">💰 CASHFLOW</span>
-      <span id="room-id-txt" style="font-size:9px;color:#64748b;"></span>
+      <span style="color:#fbbf24;font-weight:800;font-size:17px;letter-spacing:2px;">💰 CASHFLOW</span>
+      <span id="room-id-txt" style="font-size:21px;color:#64748b;"></span>
       <button class="hbtn" onclick="copyRoomId()" style="color:#fbbf24;border-color:rgba(251,191,36,0.3);">IDコピー</button>
     </div>
     <div id="hdr-mid">
@@ -163,13 +163,13 @@ button{cursor:pointer;font-family:inherit;}
     </div>
     <div id="hdr-right">
       <div style="display:flex;gap:8px;margin-right:4px;">
-        <div style="text-align:center;"><div style="font-size:7px;color:#64748b;">受動収入</div><div id="h-passive" style="font-size:9px;font-weight:700;color:#4ade80;"></div></div>
-        <div style="text-align:center;"><div style="font-size:7px;color:#64748b;">月支出</div><div id="h-expense" style="font-size:9px;font-weight:700;color:#f87171;"></div></div>
-        <div style="text-align:center;"><div style="font-size:7px;color:#64748b;">貯蓄</div><div id="h-save" style="font-size:9px;font-weight:700;color:#fbbf24;"></div></div>
+        <div style="text-align:center;"><div style="font-size:17px;color:#64748b;">受動収入</div><div id="h-passive" style="font-size:21px;font-weight:700;color:#4ade80;"></div></div>
+        <div style="text-align:center;"><div style="font-size:17px;color:#64748b;">月支出</div><div id="h-expense" style="font-size:21px;font-weight:700;color:#f87171;"></div></div>
+        <div style="text-align:center;"><div style="font-size:17px;color:#64748b;">貯蓄</div><div id="h-save" style="font-size:21px;font-weight:700;color:#fbbf24;"></div></div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;min-width:80px;">
         <div class="prog-bar" style="flex:1;"><div id="h-prog" class="prog-fill" style="width:0%;"></div></div>
-        <span id="h-pct" style="font-size:8px;color:#64748b;white-space:nowrap;"></span>
+        <span id="h-pct" style="font-size:13px;color:#64748b;white-space:nowrap;"></span>
       </div>
       <button class="hbtn" onclick="SFX.click();showLoanModal()" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);">🏦 ローン</button>
       <button class="hbtn" onclick="SFX.click();saveGame()" style="color:#4ade80;border-color:rgba(74,222,128,0.3);">💾 セーブ</button>
@@ -184,7 +184,7 @@ button{cursor:pointer;font-family:inherit;}
         <!-- Board spaces rendered by JS -->
         <div id="board-frame" style="position:absolute;inset:0;border:3px solid rgba(251,191,36,0.18);border-radius:12px;pointer-events:none;z-index:0;"></div>
         <div id="center-panel">
-          <div style="position:absolute;top:5px;font-size:10px;color:rgba(255,255,255,0.08);letter-spacing:6px;font-weight:700;">🐀 RAT RACE</div>
+          <div style="position:absolute;top:5px;font-size:42px;color:rgba(255,255,255,0.08);letter-spacing:6px;font-weight:700;">🐀 RAT RACE</div>
           <div id="center-content"></div>
         </div>
       </div>
@@ -192,12 +192,12 @@ button{cursor:pointer;font-family:inherit;}
 
     <div id="bottom">
       <div id="my-panel">
-        <div style="font-size:9px;color:#fbbf24;font-weight:700;margin-bottom:4px;">📦 あなたの資産・株式</div>
+        <div style="font-size:21px;color:#fbbf24;font-weight:700;margin-bottom:4px;">📦 あなたの資産・株式</div>
         <div id="my-assets" style="display:flex;flex-wrap:wrap;gap:3px;overflow:hidden;max-height:82px;"></div>
       </div>
       <div id="players-panel"></div>
       <div id="log-panel">
-        <div style="font-size:8px;color:#475569;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;">ゲームログ</div>
+        <div style="font-size:13px;color:#475569;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;">ゲームログ</div>
         <div id="game-log"></div>
       </div>
     </div>
@@ -207,9 +207,9 @@ button{cursor:pointer;font-family:inherit;}
   <div id="winner-overlay">
     <div style="font-size:80px;">🏆</div>
     <div id="winner-name" style="font-size:42px;color:#fbbf24;font-weight:800;"></div>
-    <div style="font-size:18px;color:#f59e0b;">ラットレース脱出！</div>
-    <button onclick="saveGame()" style="padding:9px 24px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);border-radius:9px;color:#4ade80;font-size:13px;font-weight:700;">💾 結果をセーブ</button>
-    <button onclick="location.reload()" style="padding:9px 24px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:9px;color:#0f172a;font-size:13px;font-weight:800;">🔄 もう一度</button>
+    <div style="font-size:42px;color:#f59e0b;">ラットレース脱出！</div>
+    <button onclick="saveGame()" style="padding:9px 24px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);border-radius:9px;color:#4ade80;font-size:17px;font-weight:700;">💾 結果をセーブ</button>
+    <button onclick="location.reload()" style="padding:9px 24px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:9px;color:#0f172a;font-size:17px;font-weight:800;">🔄 もう一度</button>
   </div>
 </div>
 
@@ -217,6 +217,17 @@ button{cursor:pointer;font-family:inherit;}
 <div id="status-bar"></div>
 
 <!-- ══ MODALS ══ -->
+<!-- Log history modal -->
+<div class="overlay" id="log-overlay" onclick="closeModal('log-overlay')">
+  <div class="modal-box" style="width:600px;max-height:88vh;" onclick="event.stopPropagation()">
+    <div class="modal-title">
+      <span>📋 ゲーム全履歴</span>
+      <button class="close-btn" onclick="closeModal('log-overlay')">✕</button>
+    </div>
+    <div id="log-all" style="font-size:12px;line-height:1.9;"></div>
+  </div>
+</div>
+
 <!-- Financial -->
 <div class="overlay" id="fin-overlay" onclick="closeModal('fin-overlay')">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -229,16 +240,16 @@ button{cursor:pointer;font-family:inherit;}
 <div class="overlay" id="stock-overlay" onclick="closeModal('stock-overlay')">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title"><span id="stock-title">株式購入</span><button class="close-btn" onclick="closeModal('stock-overlay')">✕</button></div>
-    <div style="font-size:10px;color:#64748b;margin-bottom:10px;">1株 ¥<span id="stock-price-txt"></span> ／ 最大 <span id="stock-max-txt"></span>株</div>
+    <div style="font-size:42px;color:#64748b;margin-bottom:10px;">1株 ¥<span id="stock-price-txt"></span> ／ 最大 <span id="stock-max-txt"></span>株</div>
     <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:12px;">
-      <button onclick="adjQty(-10)" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">-10</button>
-      <button onclick="adjQty(-1)"  style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">-1</button>
-      <input id="stock-qty" type="number" value="1" min="1" style="width:64px;text-align:center;font-size:18px;font-weight:700;color:#fbbf24;">
-      <button onclick="adjQty(1)"   style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">+1</button>
-      <button onclick="adjQty(10)"  style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:11px;">+10</button>
+      <button onclick="adjQty(-10)" style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:47px;">-10</button>
+      <button onclick="adjQty(-1)"  style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:47px;">-1</button>
+      <input id="stock-qty" type="number" value="1" min="1" style="width:64px;text-align:center;font-size:42px;font-weight:700;color:#fbbf24;">
+      <button onclick="adjQty(1)"   style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:47px;">+1</button>
+      <button onclick="adjQty(10)"  style="padding:4px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f0;font-size:47px;">+10</button>
     </div>
-    <div id="stock-total" style="text-align:center;font-size:13px;font-weight:700;margin-bottom:10px;"></div>
-    <button onclick="confirmBuyStock()" style="width:100%;padding:10px;background:#10b981;border:none;border-radius:8px;color:white;font-weight:800;font-size:13px;">購入確定</button>
+    <div id="stock-total" style="text-align:center;font-size:17px;font-weight:700;margin-bottom:10px;"></div>
+    <button onclick="confirmBuyStock()" style="width:100%;padding:10px;background:#10b981;border:none;border-radius:8px;color:white;font-weight:800;font-size:17px;">購入確定</button>
     <button onclick="closeModal('stock-overlay')" class="btn-outline" style="margin-top:6px;">キャンセル</button>
   </div>
 </div>
@@ -247,13 +258,13 @@ button{cursor:pointer;font-family:inherit;}
 <div class="overlay" id="loan-overlay" onclick="closeModal('loan-overlay')">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title"><span>🏦 銀行ローン（月利10%）</span><button class="close-btn" onclick="closeModal('loan-overlay')">✕</button></div>
-    <div style="font-size:10px;color:#94a3b8;margin-bottom:10px;line-height:1.6;">1000単位で借入できます。借りた金額の10%が毎月の支出に追加されます。<br>例：¥3,000借りる → 毎月¥300の利息</div>
+    <div style="font-size:42px;color:#94a3b8;margin-bottom:10px;line-height:1.6;">1000単位で借入できます。借りた金額の10%が毎月の支出に追加されます。<br>例：¥3,000借りる → 毎月¥300の利息</div>
     <div class="lbl">借入金額（1000単位）</div>
     <input id="loan-amt" type="number" value="1000" min="1000" step="1000" style="margin-bottom:12px;">
-    <button onclick="confirmLoan()" style="width:100%;padding:10px;background:#f59e0b;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:13px;">借入する</button>
+    <button onclick="confirmLoan()" style="width:100%;padding:10px;background:#f59e0b;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:17px;">借入する</button>
     <div class="lbl" style="margin-top:12px;">返済金額（1000単位）</div>
     <input id="repay-amt" type="number" value="1000" min="1000" step="1000" style="margin-bottom:12px;">
-    <button onclick="confirmRepay()" style="width:100%;padding:10px;background:#4ade80;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:13px;">返済する</button>
+    <button onclick="confirmRepay()" style="width:100%;padding:10px;background:#4ade80;border:none;border-radius:8px;color:#0f172a;font-weight:800;font-size:17px;">返済する</button>
   </div>
 </div>
 
@@ -357,7 +368,7 @@ function addLog(msg,type="info"){
   const colors={ok:"#4ade80",err:"#f87171",warn:"#fbbf24",pay:"#34d399",win:"#fbbf24",sys:"#94a3b8",roll:"#93c5fd"};
   const el=document.getElementById("game-log");
   const d=document.createElement("div");
-  d.style.cssText=`font-size:8px;padding:1px 0;border-bottom:1px solid rgba(255,255,255,0.03);color:${colors[type]||"#cbd5e1"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
+  d.style.cssText=`font-size:13px;padding:1px 0;border-bottom:1px solid rgba(255,255,255,0.03);color:${colors[type]||"#cbd5e1"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
   d.textContent=msg;
   el.insertBefore(d,el.firstChild);
   while(el.children.length>60)el.removeChild(el.lastChild);
@@ -510,7 +521,7 @@ function startGame(){
 }
 
 // ── BUILD BOARD SPACES (DOM) ──
-const BOARD_W=1360,BOARD_H=880,SW=140,SH=140;
+const BOARD_W=1800,BOARD_H=660,SW=140,SH=140;
 function calcPos(i){
   if(i<=6)  return{x:i*(BOARD_W-SW)/6,y:0};
   if(i<=11) return{x:BOARD_W-SW,y:(i-6)*(BOARD_H-SH)/6};
@@ -532,9 +543,9 @@ function buildBoardSpaces(){
       `background:${bg};border:2px solid ${col}88;border-radius:9px;cursor:pointer;`+
       `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;`+
       `transition:all 0.15s;overflow:hidden;z-index:2;`;
-    d.innerHTML=`<div class="si-num" style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;">${i}</div>`+
-      `<div style="font-size:38px;line-height:1;">${SICON[t]}</div>`+
-      `<div style="font-size:12px;color:${col};font-weight:800;text-align:center;line-height:1.3;padding:0 4px;">${{small:"スモール",big:"ビッグ",market:"市場",payday:"給料日",charity:"寄付"}[t]}</div>`+
+    d.innerHTML=`<div class="si-num" style="font-size:47px;color:rgba(255,255,255,0.3);font-weight:700;">${i}</div>`+
+      `<div style="font-size:23px;line-height:1;">${SICON[t]}</div>`+
+      `<div style="font-size:16px;color:${col};font-weight:800;text-align:center;line-height:1.3;padding:0 4px;">${{small:"スモール",big:"ビッグ",market:"市場",payday:"給料日",charity:"寄付"}[t]}</div>`+
       `<div class="si-tokens" style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:${SW-10}px;margin-top:3px;"></div>`;
     d.title=SLABEL[t]+": "+SDESC[t];
     d.addEventListener("mouseenter",()=>{d.style.background=col+"33";d.style.boxShadow=`0 0 8px ${col}77`;});
@@ -573,7 +584,7 @@ function updateSpaceStyle(i){
   tokWrap.innerHTML="";
   (st.players||[]).filter(p=>p.pos===i).forEach(p=>{
     const tok=document.createElement("div");
-    tok.style.cssText=`width:32px;height:32px;border-radius:50%;background:${TC[p.id%6]};display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.3);`;
+    tok.style.cssText=`width:32px;height:32px;border-radius:50%;background:${TC[p.id%6]};display:flex;align-items:center;justify-content:center;font-size:21px;color:white;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.3);`;
     tok.textContent=p.isAI?"🤖":p.name[0];
     tokWrap.appendChild(tok);
   });
@@ -636,12 +647,12 @@ function renderCenter(st){
   const isMyTurn=(st.ci===G.myIdx);
 
   if(st.winner){
-    el.innerHTML=`<div style="font-size:32px;">🏆</div><div style="color:#fbbf24;font-weight:800;font-size:13px;">${st.winner} 脱出！</div>`;
+    el.innerHTML=`<div style="font-size:42px;">🏆</div><div style="color:#fbbf24;font-weight:800;font-size:17px;">${st.winner} 脱出！</div>`;
     return;
   }
 
   if(isAI){
-    el.innerHTML=`<div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:5px 12px;font-size:11px;color:#a78bfa;display:flex;align-items:center;gap:6px;"><div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;animation:pulse 0.7s infinite;"></div>🤖 ${cp.name} が考え中...</div>`;
+    el.innerHTML=`<div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:5px 12px;font-size:47px;color:#a78bfa;display:flex;align-items:center;gap:6px;"><div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;animation:pulse 0.7s infinite;"></div>🤖 ${cp.name} が考え中...</div>`;
     return;
   }
 
@@ -652,13 +663,13 @@ function renderCenter(st){
     el.innerHTML=`
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
         <div class="die-face">${d?df[d.d1]:"⚄"}</div>
-        <span style="font-size:22px;color:#475569;">+</span>
+        <span style="font-size:16px;color:#475569;">+</span>
         <div class="die-face">${d?df[d.d2]:"⚄"}</div>
-        ${d?`<span style="font-size:36px;font-weight:800;color:#fbbf24;animation:fadeUp 0.3s ease;">= ${d.tot}</span>`:""}
+        ${d?`<span style="font-size:47px;font-weight:800;color:#fbbf24;animation:fadeUp 0.3s ease;">= ${d.tot}</span>`:""}
       </div>
-      ${isMyTurn?`<button onclick="SFX.roll();doRoll()" style="padding:10px 30px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:14px;font-weight:800;animation:glow 2s infinite;cursor:pointer;">🎲 ダイスを振る</button>`
-        :`<div style="color:#64748b;font-size:11px;">${cp.name} のターンを待っています...</div>`}
-      <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:4px;">${cp.emoji||""} ${cp.name}（${cp.job}）のターン</div>`;
+      ${isMyTurn?`<button onclick="SFX.roll();doRoll()" style="padding:10px 30px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#0f172a;font-size:13px;font-weight:800;animation:glow 2s infinite;cursor:pointer;">🎲 ダイスを振る</button>`
+        :`<div style="color:#64748b;font-size:47px;">${cp.name} のターンを待っています...</div>`}
+      <div style="font-size:21px;color:rgba(255,255,255,0.2);margin-top:4px;">${cp.emoji||""} ${cp.name}（${cp.job}）のターン</div>`;
   } else if(st.phase==="card"&&st.card){
     const c=cardById(st.card); if(!c){doEndTurn();return;}
     const ct=st.ctype;
@@ -668,10 +679,10 @@ function renderCenter(st){
     const canBuy=ct==="mkt"||c.kind==="stock"||c.kind==="doodad"||(c.down&&p.save>=c.down);
     el.innerHTML=`
       <div style="width:100%;max-width:290px;animation:fadeUp 0.3s ease;">
-        <span style="padding:1px 7px;border-radius:4px;border:1px solid ${col};background:${col}1e;color:${col};font-size:8px;font-weight:700;">${lbl}</span>
-        <h3 style="font-size:13px;font-weight:800;color:#e2e8f0;margin:4px 0 2px;">${c.name}</h3>
-        <p style="color:#94a3b8;font-size:8px;margin:0 0 5px;">${c.info}</p>
-        <div style="background:rgba(255,255,255,0.03);border-radius:5px;padding:4px 8px;font-size:9px;margin-bottom:5px;">
+        <span style="padding:1px 7px;border-radius:4px;border:1px solid ${col};background:${col}1e;color:${col};font-size:13px;font-weight:700;">${lbl}</span>
+        <h3 style="font-size:17px;font-weight:800;color:#e2e8f0;margin:4px 0 2px;">${c.name}</h3>
+        <p style="color:#94a3b8;font-size:13px;margin:0 0 5px;">${c.info}</p>
+        <div style="background:rgba(255,255,255,0.03);border-radius:5px;padding:4px 8px;font-size:21px;margin-bottom:5px;">
           ${c.cost&&!c.price?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">コスト</span><span>¥${c.cost.toLocaleString()}</span></div>`:""}
           ${c.price?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">株価</span><span>¥${c.price}/株</span></div>`:""}
           ${c.down?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">頭金</span><span style="color:${p.save>=c.down?"#4ade80":"#f87171"};">¥${c.down.toLocaleString()} ${p.save>=c.down?"✅":"❌"}</span></div>`:""}
@@ -680,19 +691,19 @@ function renderCenter(st){
         ${isMyTurn?`
         <div style="display:flex;gap:6px;">
           ${ct!=="mkt"?`
-            <button onclick="SFX.click();doCardAction('buy')" ${!canBuy?"disabled":""} style="padding:5px 13px;background:${canBuy?"#10b981":"#374151"};border:none;border-radius:6px;color:${canBuy?"white":"#64748b"};font-weight:700;cursor:${canBuy?"pointer":"not-allowed"};font-size:10px;animation:${canBuy?"":"none"};">${c.kind==="stock"?"株を購入":"購入する"}</button>
-            <button onclick="SFX.skip();doCardAction('skip')" style="padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:10px;">見送る</button>
-          `:`<button onclick="SFX.good();doCardAction('apply')" style="padding:5px 13px;background:#10b981;border:none;border-radius:6px;color:white;font-weight:700;cursor:pointer;font-size:10px;">カードを適用</button>`}
-        </div>`:`<div style="color:#64748b;font-size:10px;">${cp.name}の行動を待っています...</div>`}
+            <button onclick="SFX.click();doCardAction('buy')" ${!canBuy?"disabled":""} style="padding:5px 13px;background:${canBuy?"#10b981":"#374151"};border:none;border-radius:6px;color:${canBuy?"white":"#64748b"};font-weight:700;cursor:${canBuy?"pointer":"not-allowed"};font-size:42px;animation:${canBuy?"":"none"};">${c.kind==="stock"?"株を購入":"購入する"}</button>
+            <button onclick="SFX.skip();doCardAction('skip')" style="padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:42px;">見送る</button>
+          `:`<button onclick="SFX.good();doCardAction('apply')" style="padding:5px 13px;background:#10b981;border:none;border-radius:6px;color:white;font-weight:700;cursor:pointer;font-size:42px;">カードを適用</button>`}
+        </div>`:`<div style="color:#64748b;font-size:42px;">${cp.name}の行動を待っています...</div>`}
       </div>`;
   } else if(st.phase==="end"){
     const next=st.players[(st.ci+1)%st.players.length]||{};
     el.innerHTML=`
       <div style="display:flex;flex-direction:column;align-items:center;gap:5px;animation:fadeUp 0.3s ease;">
-        <div style="font-size:36px;">✅</div>
-        <p style="color:#94a3b8;margin:0;font-size:11px;">ターン終了</p>
-        <p style="color:#64748b;font-size:9px;margin:0;">次: ${next.isAI?"🤖":next.emoji||""} ${next.name||""}</p>
-        ${isMyTurn?`<button onclick="SFX.select();doEndTurn()" style="padding:7px 22px;background:#3b82f6;border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px;">次のプレイヤーへ →</button>`:""}
+        <div style="font-size:47px;">✅</div>
+        <p style="color:#94a3b8;margin:0;font-size:47px;">ターン終了</p>
+        <p style="color:#64748b;font-size:21px;margin:0;">次: ${next.isAI?"🤖":next.emoji||""} ${next.name||""}</p>
+        ${isMyTurn?`<button onclick="SFX.select();doEndTurn()" style="padding:7px 22px;background:#3b82f6;border:none;border-radius:8px;color:white;font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;">次のプレイヤーへ →</button>`:""}
       </div>`;
   }
 }
@@ -704,24 +715,24 @@ function renderPlayers(st){
     const pi=getPI(p),me=getExp(p),pct=Math.min(100,Math.round((pi/Math.max(1,me))*100));
     const isCur=i===st.ci;
     const d=document.createElement("div");
-    d.style.cssText=`flex:0 0 115px;background:#0a1628;border-radius:9px;padding:7px 8px;cursor:pointer;border:1px solid ${isCur?TC[i%6]+"88":p.isAI?"rgba(139,92,246,0.15)":"rgba(255,255,255,0.05)"};`;
+    d.style.cssText=`flex:0 0 170px;background:#0a1628;border-radius:12px;padding:10px 11px;cursor:pointer;border:1px solid ${isCur?TC[i%6]+"88":p.isAI?"rgba(139,92,246,0.15)":"rgba(255,255,255,0.05)"};`;
     d.innerHTML=`
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-        <div style="width:20px;height:20px;border-radius:50%;background:${TC[i%6]};display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:${isCur?"0 0 7px "+TC[i%6]:"none"};">${p.isAI?"🤖":p.name[0]}</div>
+        <div style="width:20px;height:20px;border-radius:50%;background:${TC[i%6]};display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:${isCur?"0 0 7px "+TC[i%6]:"none"};">${p.isAI?"🤖":p.name[0]}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:9px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}${p.isAI?`<span style="font-size:7px;color:#8b5cf6;"> AI</span>`:""}</div>
-          <div style="font-size:7px;color:#64748b;">${p.job}</div>
+          <div style="font-size:21px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}${p.isAI?`<span style="font-size:17px;color:#8b5cf6;"> AI</span>`:""}</div>
+          <div style="font-size:17px;color:#64748b;">${p.job}</div>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:8px;color:#94a3b8;margin-bottom:2px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;margin-bottom:2px;">
         <span>¥${(p.save||0).toLocaleString()}</span>
         <span style="color:${pct>=100?"#4ade80":"#94a3b8"};">${pct}%</span>
       </div>
       <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${TC[i%6]};"></div>
       </div>
-      ${p.layoff>0?`<div style="font-size:7px;color:#f87171;margin-top:1px;">リストラ中</div>`:""}
-      ${(p.assets||[]).length>0||Object.keys(p.stocks||{}).length>0?`<div style="font-size:7px;color:#4ade80;margin-top:1px;">資産${(p.assets||[]).length} 株${Object.keys(p.stocks||{}).length}</div>`:""}
+      ${p.layoff>0?`<div style="font-size:17px;color:#f87171;margin-top:1px;">リストラ中</div>`:""}
+      ${(p.assets||[]).length>0||Object.keys(p.stocks||{}).length>0?`<div style="font-size:17px;color:#4ade80;margin-top:1px;">資産${(p.assets||[]).length} 株${Object.keys(p.stocks||{}).length}</div>`:""}
     `;
     d.addEventListener("click",()=>openFinModal(i));
     el.appendChild(d);
@@ -734,11 +745,11 @@ function renderMyAssets(st){
   const myP=st.players[G.myIdx]||{};
   (myP.assets||[]).forEach((a,idx)=>{
     const d=document.createElement("div");
-    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:4px;padding:1px 5px;font-size:13px;";
     d.innerHTML=`<span>${a.name}</span><span style="color:#4ade80;">+¥${a.cf}</span>`;
     if(G.isHost){
       const btn=document.createElement("button");
-      btn.textContent="売";btn.style.cssText="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:7px;";
+      btn.textContent="売";btn.style.cssText="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:17px;";
       btn.onclick=()=>doSellAsset(idx);
       d.appendChild(btn);
     }
@@ -746,11 +757,11 @@ function renderMyAssets(st){
   });
   Object.entries(myP.stocks||{}).forEach(([sn,qty])=>{
     const d=document.createElement("div");
-    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(147,197,253,0.08);border:1px solid rgba(147,197,253,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(147,197,253,0.08);border:1px solid rgba(147,197,253,0.2);border-radius:4px;padding:1px 5px;font-size:13px;";
     d.innerHTML=`<span>${sn}</span><span style="color:#93c5fd;">${qty}株</span>`;
     if(G.isHost){
       const btn=document.createElement("button");
-      btn.textContent="売";btn.style.cssText="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:7px;";
+      btn.textContent="売";btn.style.cssText="padding:0 3px;background:rgba(239,68,68,0.15);border:none;border-radius:2px;color:#f87171;cursor:pointer;font-size:17px;";
       btn.onclick=()=>doSellStock(sn);
       d.appendChild(btn);
     }
@@ -758,7 +769,7 @@ function renderMyAssets(st){
   });
   if((myP.bankLoan||0)>0){
     const d=document.createElement("div");
-    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:4px;padding:1px 5px;font-size:8px;";
+    d.style.cssText="display:flex;align-items:center;gap:3px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:4px;padding:1px 5px;font-size:13px;";
     d.innerHTML=`<span style="color:#f87171;">ローン¥${(myP.bankLoan||0).toLocaleString()}</span>`;
     el.appendChild(d);
   }
@@ -771,7 +782,7 @@ async function doRoll(){
   const d1=Math.ceil(Math.random()*6),d2=Math.ceil(Math.random()*6),tot=d1+d2;
   // Show dice animation then move token
   showDiceAnim(d1,d2,null);
-  await new Promise(r=>setTimeout(r,1400));
+  await new Promise(r=>setTimeout(r,1800));
   const players=clonePlrs(st.players);
   const ci=st.ci; let p=players[ci];
   const prev=p.pos, next=(prev+tot)%N;
@@ -968,7 +979,7 @@ function openFinModal(pi){
   const pii=getPI(p),me=getExp(p),cf=getCF(p);
   document.getElementById("fin-title").textContent=(p.isAI?"🤖":p.emoji||"")+" "+p.name+" の財務諸表";
   document.getElementById("fin-body").innerHTML=`
-    <div style="font-size:9px;font-weight:600;color:#fbbf24;margin-bottom:3px;">損益計算書（月次）</div>
+    <div style="font-size:21px;font-weight:600;color:#fbbf24;margin-bottom:3px;">損益計算書（月次）</div>
     ${[["給与収入",p.sal,true],["受動的収入",pii,true],null,
       ["税金",p.exp?.tax],["住宅ローン",p.exp?.mort],["車ローン",p.exp?.car],
       ["クレジット",p.exp?.cc],["その他",p.exp?.misc],["子供("+(p.kids||0)+"人)",(p.exp?.child||0)*(p.kids||0)],
@@ -976,20 +987,20 @@ function openFinModal(pi){
     ].map(r=>{
       if(!r)return`<div style="height:1px;background:rgba(255,255,255,0.07);margin:3px 0;"></div>`;
       const[l,v,pos,tot]=r;
-      return`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);${tot?"font-weight:700;":""}">
+      return`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:21px;border-bottom:1px solid rgba(255,255,255,0.03);${tot?"font-weight:700;":""}">
         <span style="color:#94a3b8;">${l}</span>
         <span style="color:${tot?(v>=0?"#4ade80":"#f87171"):pos?"#4ade80":"#f87171"};">¥${Math.abs(v||0).toLocaleString()}</span>
       </div>`;
     }).join("")}
     ${(p.assets||[]).length>0?`
-      <div style="font-size:9px;font-weight:600;color:#fbbf24;margin:7px 0 3px;">保有資産</div>
-      ${(p.assets||[]).map(a=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);">
+      <div style="font-size:21px;font-weight:600;color:#fbbf24;margin:7px 0 3px;">保有資産</div>
+      ${(p.assets||[]).map(a=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:21px;border-bottom:1px solid rgba(255,255,255,0.03);">
         <span style="color:#94a3b8;">${a.name}</span><span style="color:#4ade80;">+¥${a.cf}/月</span>
       </div>`).join("")}
     `:""}
     ${Object.keys(p.stocks||{}).length>0?`
-      <div style="font-size:9px;font-weight:600;color:#fbbf24;margin:7px 0 3px;">株式</div>
-      ${Object.entries(p.stocks||{}).map(([sn,qty])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);">
+      <div style="font-size:21px;font-weight:600;color:#fbbf24;margin:7px 0 3px;">株式</div>
+      ${Object.entries(p.stocks||{}).map(([sn,qty])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:21px;border-bottom:1px solid rgba(255,255,255,0.03);">
         <span style="color:#94a3b8;">${sn}</span><span style="color:#93c5fd;">${qty}株</span>
       </div>`).join("")}
     `:""}
@@ -1145,7 +1156,7 @@ function animateTokenMove(playerId,fromPos,toPos,steps,onDone){
         });
       }
     }
-    setTimeout(next, 220);
+    setTimeout(next, 440);
   }
   next();
 }
