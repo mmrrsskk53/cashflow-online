@@ -38,7 +38,23 @@ button{cursor:pointer;font-family:inherit;}
 #players-panel{flex:1;display:flex;gap:5px;overflow-x:auto;}
 #log-panel{flex:0 0 280px;background:#0a1628;border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,0.04);overflow:hidden;cursor:pointer;}
 /* Center action */
-#center-panel{position:absolute;left:134px;top:134px;right:134px;bottom:134px;background:rgba(3,6,16,0.97);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:7px;overflow:hidden;z-index:4;}
+#center-panel{
+  position:absolute;left:0;top:0;right:0;bottom:0;
+  background:transparent;border:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0;overflow:visible;z-index:8;pointer-events:none;
+}
+#action-box{
+  background:rgba(4,8,22,0.96);
+  border:2px solid rgba(251,191,36,0.3);
+  border-radius:14px;
+  padding:16px 20px;
+  min-width:280px;max-width:360px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  pointer-events:all;
+  box-shadow:0 0 30px rgba(0,0,0,0.8),0 0 15px rgba(251,191,36,0.15);
+  position:relative;
+}
 /* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;z-index:200;}
 .overlay.show{display:flex;}
@@ -184,8 +200,9 @@ button{cursor:pointer;font-family:inherit;}
         <!-- Board spaces rendered by JS -->
         <div id="board-frame" style="position:absolute;inset:0;border:3px solid rgba(251,191,36,0.18);border-radius:12px;pointer-events:none;z-index:0;"></div>
         <div id="center-panel">
-          <div style="position:absolute;top:5px;font-size:42px;color:rgba(255,255,255,0.08);letter-spacing:6px;font-weight:700;">🐀 RAT RACE</div>
-          <div id="center-content"></div>
+          <div id="action-box">
+            <div id="center-content"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -228,6 +245,17 @@ button{cursor:pointer;font-family:inherit;}
   </div>
 </div>
 
+<!-- Log fullscreen overlay -->
+<div id="log-fullscreen" style="display:none;position:fixed;inset:0;background:#050c1a;z-index:600;flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#0a1628;border-bottom:2px solid rgba(251,191,36,0.3);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:22px;">📋</span>
+      <span style="font-size:18px;font-weight:800;color:#fbbf24;">ゲーム全履歴</span>
+    </div>
+    <button onclick="closeLogFullscreen()" style="padding:8px 20px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#f87171;font-size:14px;font-weight:700;cursor:pointer;">✕ 閉じる</button>
+  </div>
+  <div id="log-all" style="flex:1;overflow-y:auto;padding:16px 24px;"></div>
+</div>
 <!-- Financial -->
 <div class="overlay" id="fin-overlay" onclick="closeModal('fin-overlay')">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -286,7 +314,7 @@ const FB_CONFIG = {
 // ── GAME DATA ──
 const TC=["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899"];
 const N=24;
-const STYPE={0:"payday",1:"small",2:"small",3:"big",4:"market",5:"small",6:"small",7:"big",8:"market",9:"payday",10:"small",11:"charity",12:"payday",13:"small",14:"big",15:"market",16:"small",17:"small",18:"big",19:"market",20:"small",21:"payday",22:"charity",23:"small"};
+const STYPE={0:"payday",1:"small",2:"small",3:"big",4:"market",5:"small",6:"small",7:"big",8:"market",9:"small",10:"small",11:"payday",12:"charity",13:"small",14:"big",15:"market",16:"small",17:"small",18:"big",19:"market",20:"small",21:"small",22:"payday",23:"charity"};
 const SCOL={small:"#3b82f6",big:"#8b5cf6",market:"#f59e0b",payday:"#10b981",charity:"#ec4899"};
 const SICON={small:"🔵",big:"🟣",market:"🟡",payday:"💰",charity:"🩷"};
 const SLABEL={small:"スモールディール",big:"ビッグディール",market:"マーケット",payday:"給料日",charity:"寄付"};
@@ -523,14 +551,14 @@ function startGame(){
 // ── BUILD BOARD SPACES (DOM) ──
 const BOARD_W=1900,BOARD_H=520,SW=132,SH=132;
 function calcPos(i){
-  // 上10(0-9): 左→右
-  if(i<=9)  return{x:i*(BOARD_W-SW)/9, y:0};
-  // 右2(10-11): 上→下
-  if(i<=11) return{x:BOARD_W-SW, y:(i-9)*(BOARD_H-SH)/3};
-  // 下10(12-21): 右→左
-  if(i<=21) return{x:(21-i)*(BOARD_W-SW)/9, y:BOARD_H-SH};
-  // 左2(22-23): 下→上
-  return{x:0, y:(24-i)*(BOARD_H-SH)/3};
+  // 上11(0-10): 左→右
+  if(i<=10) return{x:i*(BOARD_W-SW)/10, y:0};
+  // 右1(11): 中央右
+  if(i===11) return{x:BOARD_W-SW, y:(BOARD_H-SH)/2};
+  // 下11(12-22): 右→左
+  if(i<=22) return{x:(22-i)*(BOARD_W-SW)/10, y:BOARD_H-SH};
+  // 左1(23): 中央左
+  return{x:0, y:(BOARD_H-SH)/2};
 }
 
 function buildBoardSpaces(){
@@ -885,10 +913,10 @@ async function doApplyMkt(){
     if(mc.fx==="layoff"){p.layoff=2;SFX.bad();addLog(p.name+" リストラ！2ターン休み","err");}
     players[ci]=p;
   }else{
-    if(mc.fx==="re_up"){mfx={type:"re_up",mul:mc.mul};SFX.good();addLog("不動産価格上昇！130%売却可","ok");}
-    if(mc.fx==="st_up"){mfx={type:"st_up",mul:mc.mul};SFX.good();addLog("株価急騰！"+mc.mul+"倍売却可","ok");}
-    if(mc.fx==="st_down"){SFX.bad();addLog("株価暴落！","err");}
-    if(mc.fx==="rate_up"){players.forEach(p=>{p.exp={...p.exp,mort:Math.floor(p.exp.mort*1.1)};});SFX.bad();addLog("金利上昇！全員ローン10%増","warn");}
+    if(mc.fx==="re_up"){mfx={type:"re_up",mul:mc.mul};SFX.good();addLog("📈 不動産バブル！全物件が130%の価格で売却可能になった","ok");}
+    if(mc.fx==="st_up"){mfx={type:"st_up",mul:mc.mul};SFX.good();addLog("📈 株式市場急騰！全保有株が"+mc.mul+"倍の価格で売却可能","ok");}
+    if(mc.fx==="st_down"){SFX.bad();addLog("📉 株価暴落！保有株の価値が下落","err");}
+    if(mc.fx==="rate_up"){players.forEach(p=>{p.exp={...p.exp,mort:Math.floor(p.exp.mort*1.1)};});SFX.bad();addLog("📉 金利上昇！全員の住宅ローンが10%増加","warn");}
   }
   await writeState({...st,players,mfx,phase:"end",card:null,ctype:""});
 }
@@ -1012,6 +1040,30 @@ function openFinModal(pi){
   document.getElementById("fin-overlay").classList.add("show");
 }
 
+function openLogModal(){
+  SFX.click();
+  openLogFullscreen();
+}
+function openLogFullscreen(){
+  const el=document.getElementById('log-all');
+  const entries=Array.from(document.getElementById('game-log').children);
+  if(entries.length===0){
+    el.innerHTML='<div style="color:#64748b;padding:20px;font-size:16px;">まだログがありません</div>';
+  } else {
+    el.innerHTML=entries.map((e,i)=>{
+      const col=e.style.color||'#cbd5e1';
+      return '<div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:14px;background:'+(i%2===0?'rgba(255,255,255,0.015)':'transparent')+';">'
+        +'<span style="color:#475569;min-width:36px;font-size:13px;flex-shrink:0;">'+(entries.length-i)+'</span>'
+        +'<span style="color:'+col+';font-size:15px;line-height:1.6;">'+e.textContent+'</span>'
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('log-fullscreen').style.display='flex';
+}
+function closeLogFullscreen(){
+  document.getElementById('log-fullscreen').style.display='none';
+}
+
 function closeModal(id){document.getElementById(id).classList.remove("show");}
 
 // ── AI ──
@@ -1056,7 +1108,15 @@ async function aiDoCard(){
   else if(c.kind==="doodad") act="skip";
   else if((c.kind==="property"||c.kind==="biz")&&(p.save||0)>=(c.down||0)&&(c.cf||0)>=50) act="buy";
   else if(c.kind==="stock"&&(p.save||0)>=(c.price||0)*5) act="buy";
-  addLog("🤖 "+p.name+"「"+c.name+"」"+(act==="skip"?"見送り":"購入/適用"),"info");
+  // ③ AI行動の詳細表示
+  if(act==="skip"){
+    const reason=c.kind==="doodad"?"ムダ遣いのため":((c.down&&p.save<c.down)?"資金不足":"条件未達");
+    addLog("🤖 "+p.name+" 「"+c.name+"」見送り（"+reason+"）","info");
+  } else if(act==="apply"){
+    addLog("🤖 "+p.name+" 「"+c.name+"」を適用","info");
+  } else {
+    addLog("🤖 "+p.name+" 「"+c.name+"」購入決定！","ok");
+  }
   if(act==="buy"&&c.kind==="stock") await aiDoStock();
   else await doCardAction(act);
 }
@@ -1068,9 +1128,12 @@ async function aiDoStock(){
   if(p.save>=total){
     const players=clonePlrs(st.players);let np=players[st.ci];
     np.save-=total;np.stocks={...np.stocks,[c.name]:(np.stocks[c.name]||0)+qty};
-    players[st.ci]=np;addLog("🤖 "+np.name+" "+c.name+" "+qty+"株購入","info");
+    players[st.ci]=np;
+    addLog("🤖 "+np.name+" "+c.name+" "+qty+"株×¥"+c.price+"=¥"+total.toLocaleString()+"で購入！","ok");
     await writeState({...st,players,phase:"end",card:null,ctype:""});
-  }else{await writeState({...st,phase:"end",card:null,ctype:""});}
+  }else{
+    addLog("🤖 "+p.name+" "+c.name+"株 資金不足→見送り","warn");
+    await writeState({...st,phase:"end",card:null,ctype:""});}
 }
 
 
